@@ -1208,19 +1208,16 @@
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             grid-template-rows: repeat(3, 1fr);
-            gap: 8px;
-            margin: 30px auto;
+            gap: 10px;
+            margin: 20px auto;
+            width: 90%;
             max-width: 600px;
-            width: 100%;
+            aspect-ratio: 5/3;
             position: relative;
-            padding: 20px;
+            padding: 15px;
             background: rgba(15, 52, 96, 0.3);
             border-radius: 10px;
             border: 2px solid rgba(212, 175, 55, 0.2);
-            aspect-ratio: 5/3;
-            min-height: 300px;
-            justify-items: stretch;
-            align-items: stretch;
         }
         
         /* Ensure grid container doesn't show text content */
@@ -1239,10 +1236,10 @@
             transition: all 0.3s ease;
             width: 100%;
             height: 100%;
-            min-height: 70px;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 3rem;
         }
 
         .complex-symbol-cell.winning {
@@ -1260,33 +1257,24 @@
             }
         }
 
+        /* Hide the strip - we'll show symbols directly in cells */
         .complex-symbol-strip {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            transition: transform 0.1s linear;
-            display: flex;
-            flex-direction: column;
+            display: none;
         }
-
-        .complex-symbol-cell.spinning .complex-symbol-strip {
-            transition: none;
-            filter: blur(2px);
-            animation: spinGlow 0.3s ease-in-out infinite alternate;
-        }
-
-        .complex-symbol-item {
-            width: 100%;
-            height: 100%;
-            min-height: 70px;
+        
+        /* Symbol display directly in cell */
+        .complex-symbol-display {
+            font-size: 3rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2.5rem;
-            flex-shrink: 0;
-            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .complex-symbol-cell.spinning .complex-symbol-display {
+            filter: blur(3px);
+            animation: spinGlow 0.3s ease-in-out infinite alternate;
         }
 
         .complex-symbol-cell.winning {
@@ -3030,7 +3018,7 @@
 
         // Paylines are now always visible - drawn in initializeComplexGrid
 
-        // Complex Slot Spin Function
+        // Complex Slot Spin Function - Simple icon change animation
         async function spinComplex() {
             if (!complexGameState.selectedCause || complexGameState.betAmount <= 0) return;
 
@@ -3038,73 +3026,47 @@
             betInputComplex.disabled = true;
             complexWinSummary.style.display = 'none';
 
-            // Animate spinning for each cell
+            // Animate spinning for each cell - simple icon change
             const spinPromises = [];
             for (let row = 0; row < GRID_ROWS; row++) {
                 for (let col = 0; col < GRID_COLS; col++) {
                     const cell = document.getElementById(`cell-${row}-${col}`);
-                    const strip = document.getElementById(`strip-${row}-${col}`);
+                    const symbolDisplay = document.getElementById(`symbol-${row}-${col}`);
+                    
+                    if (!cell || !symbolDisplay) continue;
+                    
                     cell.classList.add('spinning');
                     
                     // Generate target symbol using weighted selection
                     const targetSymbol = complexSymbolWeightedArray[Math.floor(Math.random() * complexSymbolWeightedArray.length)];
                     complexGameState.grid[row][col] = targetSymbol;
                     
-                    // Find target symbol in strip or add it if not found
-                    const symbolItems = strip.querySelectorAll('.complex-symbol-item');
-                    
-                    // Ensure target symbol exists in strip
-                    let targetIndex = -1;
-                    for (let i = 0; i < symbolItems.length; i++) {
-                        if (symbolItems[i].textContent === targetSymbol && i >= 3) {
-                            targetIndex = i;
-                            break;
-                        }
-                    }
-                    
-                    // If target symbol not found, update an item in the strip
-                    if (targetIndex === -1) {
-                        // Find a good position (between 5-15 for smooth spinning)
-                        targetIndex = Math.floor(Math.random() * 10) + 5;
-                        if (symbolItems[targetIndex]) {
-                            symbolItems[targetIndex].textContent = targetSymbol;
-                        }
-                    }
-                    
-                    // Calculate spin distance - ensure we always land on a valid position
-                    const cellHeight = cell.offsetHeight || 100; // Fallback if not rendered yet
-                    const finalY = -(targetIndex * cellHeight);
-                    const extraSpins = 3 + Math.random() * 2;
-                    const totalDistance = -(extraSpins * symbolItems.length * cellHeight) + finalY;
-                    
-                    // Animate with deceleration
+                    // Animate icon changes with random symbols during spin
                     const duration = 1500 + (row * 100) + (col * 50);
                     const delay = (row * 50) + (col * 30);
+                    const changeInterval = 100; // Change icon every 100ms during spin
                     
                     spinPromises.push(new Promise(resolve => {
                         setTimeout(() => {
                             const startTime = Date.now();
-                            let startY = 0;
-                            const distance = totalDistance;
+                            let lastChange = 0;
                             
                             function animate() {
                                 const elapsed = Date.now() - startTime;
                                 const progress = Math.min(elapsed / duration, 1);
-                                const easeOutCubic = 1 - Math.pow(1 - progress, 3);
-                                const currentY = startY + (distance * easeOutCubic);
-                                strip.style.transform = `translateY(${currentY}px)`;
+                                
+                                // Change icon periodically during spin
+                                if (elapsed - lastChange >= changeInterval) {
+                                    const randomSymbol = complexSymbolWeightedArray[Math.floor(Math.random() * complexSymbolWeightedArray.length)];
+                                    symbolDisplay.textContent = randomSymbol;
+                                    lastChange = elapsed;
+                                }
                                 
                                 if (progress < 1) {
                                     requestAnimationFrame(animate);
                                 } else {
-                                    // Ensure final position is correct
-                                    strip.style.transform = `translateY(${finalY}px)`;
-                                    // Update the visible symbol to match grid state
-                                    const visibleIndex = Math.round(Math.abs(finalY) / cellHeight);
-                                    const items = strip.querySelectorAll('.complex-symbol-item');
-                                    if (items[visibleIndex]) {
-                                        items[visibleIndex].textContent = targetSymbol;
-                                    }
+                                    // Set final symbol
+                                    symbolDisplay.textContent = targetSymbol;
                                     cell.classList.remove('spinning');
                                     resolve();
                                 }
@@ -3117,24 +3079,6 @@
 
             // Wait for all animations
             await Promise.all(spinPromises);
-            
-            // Ensure all 15 cells are properly displayed (fix missing items)
-            for (let row = 0; row < GRID_ROWS; row++) {
-                for (let col = 0; col < GRID_COLS; col++) {
-                    const cell = document.getElementById(`cell-${row}-${col}`);
-                    const strip = document.getElementById(`strip-${row}-${col}`);
-                    if (cell && strip && complexGameState.grid[row][col]) {
-                        const currentTransform = strip.style.transform;
-                        const currentY = currentTransform ? parseFloat(currentTransform.match(/-?\d+\.?\d*/)?.[0] || 0) : 0;
-                        const cellHeight = cell.offsetHeight || 100;
-                        const visibleIndex = Math.max(0, Math.min(Math.round(Math.abs(currentY) / cellHeight), 19));
-                        const symbolItems = strip.querySelectorAll('.complex-symbol-item');
-                        if (symbolItems[visibleIndex]) {
-                            symbolItems[visibleIndex].textContent = complexGameState.grid[row][col];
-                        }
-                    }
-                }
-            }
 
             // Check for wins
             const winningPaylines = checkAllPaylines();
