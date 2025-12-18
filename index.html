@@ -668,6 +668,61 @@
             50% { transform: scale(1.1); }
         }
 
+        /* Game Rules Section */
+        .game-rules {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(15, 52, 96, 0.4);
+            border-radius: 12px;
+            border: 2px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .game-rules h3 {
+            color: #d4af37;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .rules-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .rules-list li {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+            color: #e0e0e0;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        .rules-list li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: #d4af37;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .rules-list li.highlight {
+            color: #4ade80;
+            font-weight: 600;
+            margin-top: 8px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(74, 222, 128, 0.3);
+        }
+
+        .rules-list li.highlight::before {
+            content: '⭐';
+            color: #4ade80;
+        }
+
         /* Impact Progression */
         .progress-panel {
             background: rgba(26, 26, 46, 0.8);
@@ -1211,6 +1266,21 @@
                 font-size: 1.2rem;
             }
 
+            .game-rules {
+                padding: 15px;
+                margin-top: 20px;
+            }
+
+            .game-rules h3 {
+                font-size: 1rem;
+            }
+
+            .rules-list li {
+                font-size: 0.85rem;
+                padding: 8px 0;
+                padding-left: 25px;
+            }
+
             .stats-grid {
                 grid-template-columns: 1fr;
             }
@@ -1326,6 +1396,16 @@
                 
                 <button class="spin-button" id="spinButton" disabled>SPIN</button>
                 <div class="result-message" id="resultMessage"></div>
+                
+                <!-- Game Rules -->
+                <div class="game-rules">
+                    <h3>Game Rules</h3>
+                    <ul class="rules-list">
+                        <li><strong>3+ matching symbols</strong> (any position) = <span style="color: #4ade80;">Victory!</span></li>
+                        <li>Any other combination = Loss</li>
+                        <li class="highlight"><strong>All 5 symbols match</strong> = 5x Prize Multiplier!</li>
+                    </ul>
+                </div>
             </div>
 
             <div class="cause-panel">
@@ -1807,13 +1887,21 @@
         });
 
         // Show spin result popup
-        function showSpinResult(isWin) {
+        function showSpinResult(winResult) {
             const cause = causes[gameState.selectedCause];
             const donationAmount = (gameState.betAmount * DONATION_PERCENTAGE) / 100;
+            const isWin = winResult.isWin;
+            const multiplier = winResult.multiplier;
+            const winType = winResult.type;
             
             if (isWin) {
-                spinResultTitle.textContent = 'You Won! 🎉';
-                spinResultText.textContent = `You won! We're donating $${donationAmount.toFixed(2)} (${DONATION_PERCENTAGE}% of your $${gameState.betAmount.toLocaleString()} bet) to ${cause.name}.`;
+                if (winType === 'jackpot') {
+                    spinResultTitle.textContent = '🎰 JACKPOT! 5x Multiplier!';
+                    spinResultText.textContent = `Incredible! All 5 symbols matched! You won with a 5x multiplier! We're donating $${donationAmount.toFixed(2)} (${DONATION_PERCENTAGE}% of your $${gameState.betAmount.toLocaleString()} bet) to ${cause.name}.`;
+                } else {
+                    spinResultTitle.textContent = 'You Won! 🎉';
+                    spinResultText.textContent = `You won! We're donating $${donationAmount.toFixed(2)} (${DONATION_PERCENTAGE}% of your $${gameState.betAmount.toLocaleString()} bet) to ${cause.name}.`;
+                }
                 spinResultModal.classList.remove('loss');
                 spinResultModal.classList.add('win');
             } else {
@@ -1944,18 +2032,33 @@
                 reelSymbols.push(symbols[Math.floor(Math.random() * symbols.length)]);
             }
 
-            // Check for win: at least 3 matching symbols
+            // Check for win: at least 3 matching symbols, or all 5 matching (5x multiplier)
             function checkWin(symbols) {
                 const symbolCounts = {};
                 symbols.forEach(symbol => {
                     symbolCounts[symbol] = (symbolCounts[symbol] || 0) + 1;
                 });
                 
-                // Check if any symbol appears 3 or more times
-                return Object.values(symbolCounts).some(count => count >= 3);
+                const counts = Object.values(symbolCounts);
+                const maxCount = Math.max(...counts);
+                
+                // Check if all 5 symbols match (5x multiplier)
+                if (maxCount === 5) {
+                    return { isWin: true, multiplier: 5, type: 'jackpot' };
+                }
+                
+                // Check if any symbol appears 3 or more times (regular win)
+                if (maxCount >= 3) {
+                    return { isWin: true, multiplier: 1, type: 'win' };
+                }
+                
+                return { isWin: false, multiplier: 1, type: 'loss' };
             }
 
-            const isWin = checkWin(reelSymbols);
+            const winResult = checkWin(reelSymbols);
+            const isWin = winResult.isWin;
+            const winMultiplier = winResult.multiplier;
+            const winType = winResult.type;
 
             // Spin reels with cascading effect
             // Each reel starts slightly after the previous one and stops in sequence
@@ -1975,7 +2078,7 @@
             // Small delay before showing results
             await new Promise(resolve => setTimeout(resolve, 300));
 
-                gameState.spinsPlayed++;
+            gameState.spinsPlayed++;
             
             // Calculate donation amount (5% of bet)
             const donationAmount = (gameState.betAmount * DONATION_PERCENTAGE) / 100;
@@ -1983,18 +2086,25 @@
             // Impact points based on bet amount (scaled)
             // Win: 20 points per $100 bet, Loss: 5 points per $100 bet
             const baseImpact = gameState.betAmount / 100;
-                let impactGained = 0;
+            let impactGained = 0;
 
-                if (isWin) {
-                impactGained = Math.floor(baseImpact * 20);
-                    gameState.wins++;
-                resultMessage.textContent = `🎉 Victory! $${donationAmount.toFixed(2)} to cause!`;
+            if (isWin) {
+                // Apply multiplier for jackpot (all 5 matching)
+                impactGained = Math.floor(baseImpact * 20 * winMultiplier);
+                gameState.wins++;
+                
+                if (winType === 'jackpot') {
+                    resultMessage.textContent = `🎰 JACKPOT! 5x Multiplier! $${donationAmount.toFixed(2)} to cause!`;
                     resultMessage.classList.add('win');
                 } else {
+                    resultMessage.textContent = `🎉 Victory! $${donationAmount.toFixed(2)} to cause!`;
+                    resultMessage.classList.add('win');
+                }
+            } else {
                 impactGained = Math.floor(baseImpact * 5);
                 resultMessage.textContent = `Legacy grows! $${donationAmount.toFixed(2)} to cause`;
-                    resultMessage.classList.add('loss');
-                }
+                resultMessage.classList.add('loss');
+            }
 
                 gameState.impactPoints += impactGained;
                 gameState.totalImpact += impactGained;
@@ -2008,7 +2118,7 @@
 
                 // Show spin result popup
                 setTimeout(() => {
-                    showSpinResult(isWin);
+                    showSpinResult(winResult);
                 }, 500);
         }
 
@@ -2108,3 +2218,4 @@
     </script>
 </body>
 </html>
+
