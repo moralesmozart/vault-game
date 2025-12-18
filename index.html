@@ -44,6 +44,53 @@
             z-index: 1;
         }
 
+        /* Tab Navigation */
+        .tab-navigation {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+            padding-bottom: 0;
+        }
+
+        .tab-button {
+            background: rgba(15, 52, 96, 0.6);
+            border: 2px solid rgba(212, 175, 55, 0.2);
+            border-bottom: none;
+            color: #aaa;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 10px 10px 0 0;
+            transition: all 0.3s ease;
+            position: relative;
+            top: 2px;
+        }
+
+        .tab-button:hover {
+            background: rgba(15, 52, 96, 0.8);
+            color: #d4af37;
+        }
+
+        .tab-button.active {
+            background: rgba(26, 26, 46, 0.9);
+            border-color: #d4af37;
+            color: #d4af37;
+            border-bottom: 2px solid rgba(26, 26, 46, 0.9);
+            top: 0;
+            box-shadow: 0 -5px 15px rgba(212, 175, 55, 0.2);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
         /* Header */
         header {
             text-align: center;
@@ -1142,6 +1189,130 @@
             opacity: 1;
         }
 
+        /* Complex Vault Slot Styles */
+        .complex-slot-machine {
+            background: rgba(26, 26, 46, 0.8);
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            border-radius: 15px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            text-align: center;
+        }
+
+        .complex-grid-container {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 8px;
+            margin: 30px auto;
+            max-width: 600px;
+            position: relative;
+            padding: 20px;
+            background: rgba(15, 52, 96, 0.3);
+            border-radius: 10px;
+            border: 2px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .complex-symbol-cell {
+            aspect-ratio: 1;
+            background: rgba(26, 26, 46, 0.8);
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .complex-symbol-cell.spinning {
+            filter: blur(2px);
+            animation: spinGlow 0.3s ease-in-out infinite alternate;
+        }
+
+        .complex-symbol-cell.winning {
+            border-color: #4ade80;
+            box-shadow: 0 0 20px rgba(74, 222, 128, 0.6);
+            animation: winPulse 0.5s ease;
+        }
+
+        @keyframes winPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .payline-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .payline-path {
+            stroke: rgba(74, 222, 128, 0.8);
+            stroke-width: 3;
+            fill: none;
+            stroke-dasharray: 5,5;
+            animation: paylineGlow 1s ease-in-out infinite;
+        }
+
+        @keyframes paylineGlow {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        .show-paylines-toggle {
+            background: rgba(212, 175, 55, 0.2);
+            border: 2px solid rgba(212, 175, 55, 0.4);
+            color: #d4af37;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin: 15px 0;
+            transition: all 0.3s ease;
+        }
+
+        .show-paylines-toggle:hover {
+            background: rgba(212, 175, 55, 0.3);
+            transform: scale(1.05);
+        }
+
+        .show-paylines-toggle.active {
+            background: rgba(212, 175, 55, 0.4);
+            border-color: #d4af37;
+        }
+
+        .complex-win-summary {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(15, 52, 96, 0.5);
+            border-radius: 10px;
+            border: 2px solid rgba(212, 175, 55, 0.3);
+        }
+
+        .complex-win-summary.win {
+            border-color: #4ade80;
+            background: rgba(74, 222, 128, 0.1);
+        }
+
+        .complex-help-button {
+            background: rgba(212, 175, 55, 0.2);
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            color: #d4af37;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            margin-left: 10px;
+        }
+
         /* Mobile Responsive */
         @media (max-width: 767px) {
             h1 {
@@ -1347,6 +1518,14 @@
             </div>
         </section>
 
+        <!-- Tab Navigation -->
+        <div class="tab-navigation">
+            <button class="tab-button active" data-tab="basic">Basic Vault Slot</button>
+            <button class="tab-button" data-tab="complex">Complex Vault Slot</button>
+        </div>
+
+        <!-- Tab 1: Basic Vault Slot (Current Production Code) -->
+        <div class="tab-content active" id="tab-basic">
         <div class="game-section">
             <div class="slot-machine">
                 <h2 style="color: #d4af37; margin-bottom: 20px;">The Vault</h2>
@@ -1513,6 +1692,168 @@
                 </div>
             </div>
         </div>
+        </div>
+        <!-- End Tab 1: Basic Vault Slot -->
+
+        <!-- Tab 2: Complex Vault Slot -->
+        <div class="tab-content" id="tab-complex">
+            <!-- Cause Selection at Top -->
+            <div class="cause-panel" style="margin-bottom: 30px;">
+                <h2>Choose Your Cause</h2>
+                <p style="color: #aaa; font-size: 0.9rem; margin-bottom: 15px; font-style: italic;">Click on any cause to learn more</p>
+                <div class="causes" id="causesContainerComplex">
+                    <div class="cause-option" data-cause="reforest">
+                        <div class="cause-header">
+                            <span class="cause-emoji">🌱</span>
+                            <span class="cause-name">Reforest City A</span>
+                            <span class="cause-info-icon">ℹ️</span>
+                        </div>
+                        <div class="cause-kpis">
+                            <div class="cause-kpi-item">
+                                <div class="cause-kpi-label">Progress</div>
+                                <div class="cause-kpi-value" data-kpi="progress">2,847 trees</div>
+                            </div>
+                            <div class="cause-kpi-item">
+                                <div class="cause-kpi-label">Target</div>
+                                <div class="cause-kpi-value" data-kpi="target">10,000</div>
+                            </div>
+                            <div class="cause-kpi-item">
+                                <div class="cause-kpi-label">Multiplier</div>
+                                <div class="cause-kpi-value multiplier" data-kpi="multiplier">1.2x</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cause-option" data-cause="food">
+                        <div class="cause-header">
+                            <span class="cause-emoji">🍽️</span>
+                            <span class="cause-name">Food Support Initiative B</span>
+                            <span class="cause-info-icon">ℹ️</span>
+                        </div>
+                        <div class="cause-kpis">
+                            <div class="cause-kpi-item">
+                                <div class="cause-kpi-label">Progress</div>
+                                <div class="cause-kpi-value" data-kpi="progress">32,450 meals</div>
+                            </div>
+                            <div class="cause-kpi-item">
+                                <div class="cause-kpi-label">Target</div>
+                                <div class="cause-kpi-value" data-kpi="target">50,000/month</div>
+                            </div>
+                            <div class="cause-kpi-item">
+                                <div class="cause-kpi-label">Multiplier</div>
+                                <div class="cause-kpi-value multiplier" data-kpi="multiplier">1.0x</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cause-option" data-cause="ocean">
+                        <div class="cause-header">
+                            <span class="cause-emoji">🌊</span>
+                            <span class="cause-name">Ocean Cleanup Program C</span>
+                            <span class="cause-info-icon">ℹ️</span>
+                        </div>
+                        <div class="cause-kpis">
+                            <div class="cause-kpi-item">
+                                <div class="cause-kpi-label">Progress</div>
+                                <div class="cause-kpi-value" data-kpi="progress">67 tons</div>
+                            </div>
+                            <div class="cause-kpi-item">
+                                <div class="cause-kpi-label">Target</div>
+                                <div class="cause-kpi-value" data-kpi="target">100 tons</div>
+                            </div>
+                            <div class="cause-kpi-item">
+                                <div class="cause-kpi-label">Multiplier</div>
+                                <div class="cause-kpi-value multiplier" data-kpi="multiplier">1.5x</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Complex Slot Machine -->
+            <div class="complex-slot-machine">
+                <h2 style="color: #d4af37; margin-bottom: 20px;">The Vault</h2>
+                
+                <!-- Bet Section -->
+                <div class="bet-section">
+                    <label class="bet-label" for="betInputComplex">Place Your Bet</label>
+                    <div class="bet-input-container">
+                        <span class="bet-currency">$</span>
+                        <input 
+                            type="number" 
+                            id="betInputComplex" 
+                            class="bet-input" 
+                            placeholder="0" 
+                            min="1" 
+                            max="10000" 
+                            step="1"
+                            value=""
+                        >
+                        <button class="bet-max-button" id="betMaxButtonComplex">MAX</button>
+                    </div>
+                    <div class="bet-info">
+                        <span class="bet-amount-display" id="betAmountDisplayComplex">Bet: $0</span>
+                        <span>
+                            <span class="bet-percentage" id="betPercentageComplex">0%</span>
+                            <span class="bet-percentage-label">to cause</span>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- 3x5 Grid -->
+                <button class="show-paylines-toggle" id="showPaylinesToggle">Show Paylines</button>
+                <div class="complex-grid-container" id="complexGridContainer">
+                    <!-- Grid cells will be generated by JavaScript -->
+                    <svg class="payline-overlay" id="paylineOverlay" style="display: none;"></svg>
+                </div>
+
+                <!-- Win Summary -->
+                <div class="complex-win-summary" id="complexWinSummary" style="display: none;">
+                    <div id="complexWinMessage"></div>
+                </div>
+
+                <!-- Spin Button -->
+                <button class="spin-button" id="spinButtonComplex" disabled>SPIN</button>
+
+                <!-- Help Button -->
+                <button class="complex-help-button" id="complexHelpButton">How Paylines Work</button>
+            </div>
+
+            <!-- Progress and Stats (same as basic) -->
+            <div class="progress-panel">
+                <h2>Vault Progress</h2>
+                <div class="progress-label">
+                    <span id="selectedCauseNameComplex">Select a cause to begin</span>
+                    <span id="progressTextComplex">0 / 100</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="progressBarComplex">
+                        <div class="progress-percentage" id="progressPercentageComplex">0%</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-panel">
+                <h2>Session Stats</h2>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="spinsPlayedComplex">0</div>
+                        <div class="stat-label">Spins Played</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="winsComplex">0</div>
+                        <div class="stat-label">Wins</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="vaultsUnlockedComplex">0</div>
+                        <div class="stat-label">Vaults Unlocked</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalImpactComplex">0</div>
+                        <div class="stat-label">Total Impact Points</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End Tab 2: Complex Vault Slot -->
     </div>
 
     <!-- Spin Result Modal -->
@@ -1539,6 +1880,39 @@
                 <button class="cause-close-button" id="causeDetailsClose">Close</button>
                 <button class="cause-select-button" id="causeDetailsSelect">Select This Cause</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Complex Slot Help Modal -->
+    <div class="modal-overlay" id="complexHelpOverlay">
+        <div class="modal" style="max-width: 700px;">
+            <h2>How Paylines Work</h2>
+            <div class="modal-text" style="text-align: left;">
+                <p style="margin-bottom: 15px;"><strong>The Complex Vault Slot has 10 fixed paylines.</strong></p>
+                <p style="margin-bottom: 15px;">A payline wins when <strong>all 5 symbols on that line are identical</strong>.</p>
+                
+                <h3 style="color: #d4af37; margin-top: 20px; margin-bottom: 10px;">Symbol Multipliers:</h3>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="padding: 5px 0;">🔥 Torch: ×1.1</li>
+                    <li style="padding: 5px 0;">📜 Scroll: ×1.2</li>
+                    <li style="padding: 5px 0;">🧭 Compass: ×1.3</li>
+                    <li style="padding: 5px 0;">🏺 Coin: ×1.4</li>
+                    <li style="padding: 5px 0;">🌍 Globe: ×1.5</li>
+                    <li style="padding: 5px 0;">🗝️ Key: ×1.6</li>
+                    <li style="padding: 5px 0;">⭐ Legacy Star: ×1.8</li>
+                    <li style="padding: 5px 0;">💎 Vault Gem: ×2.0</li>
+                </ul>
+                
+                <h3 style="color: #d4af37; margin-top: 20px; margin-bottom: 10px;">Payout Calculation:</h3>
+                <p style="margin-bottom: 10px;">For each winning payline:</p>
+                <p style="background: rgba(212, 175, 55, 0.1); padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+                    <strong>Payout = (Bet ÷ 10) × Symbol Multiplier</strong>
+                </p>
+                <p style="margin-bottom: 15px;">If multiple paylines win, all payouts are added together!</p>
+                
+                <p style="margin-top: 20px; color: #4ade80;"><strong>💡 Tip:</strong> Click "Show Paylines" to see all 10 payline patterns on the grid!</p>
+            </div>
+            <button class="choice-button" id="complexHelpClose" style="width: 100%;">Got it!</button>
         </div>
     </div>
 
@@ -1688,6 +2062,24 @@
                 }
             });
         }
+        
+        // Tab switching functionality
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const targetTab = button.dataset.tab;
+                
+                // Remove active class from all tabs and buttons
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                
+                // Add active class to clicked tab
+                button.classList.add('active');
+                document.getElementById(`tab-${targetTab}`).classList.add('active');
+            });
+        });
         
         // Initialize reels on page load
         initializeReels();
@@ -2215,6 +2607,407 @@
 
         // Clear state on page load (fresh start every time)
         clearState();
+
+        // ============================================
+        // COMPLEX VAULT SLOT - Tab 2
+        // ============================================
+
+        // Complex Slot Symbols with Multipliers
+        const complexSymbols = {
+            '🔥': { name: 'Torch', multiplier: 1.1 },
+            '📜': { name: 'Scroll', multiplier: 1.2 },
+            '🧭': { name: 'Compass', multiplier: 1.3 },
+            '🏺': { name: 'Coin', multiplier: 1.4 },
+            '🌍': { name: 'Globe', multiplier: 1.5 },
+            '🗝️': { name: 'Key', multiplier: 1.6 },
+            '⭐': { name: 'Legacy Star', multiplier: 1.8 },
+            '💎': { name: 'Vault Gem', multiplier: 2.0 }
+        };
+
+        const complexSymbolArray = Object.keys(complexSymbols);
+        const GRID_ROWS = 3;
+        const GRID_COLS = 5;
+
+        // 10 Fixed Paylines (row, col format, 0-indexed internally)
+        const PAYLINES = [
+            // Line 1: Middle row straight
+            [[1,0], [1,1], [1,2], [1,3], [1,4]],
+            // Line 2: Top row straight
+            [[0,0], [0,1], [0,2], [0,3], [0,4]],
+            // Line 3: Bottom row straight
+            [[2,0], [2,1], [2,2], [2,3], [2,4]],
+            // Line 4: V shape
+            [[0,0], [1,1], [2,2], [1,3], [0,4]],
+            // Line 5: Inverted V
+            [[2,0], [1,1], [0,2], [1,3], [2,4]],
+            // Line 6: Upper zig-zag
+            [[1,0], [0,1], [0,2], [0,3], [1,4]],
+            // Line 7: Lower zig-zag
+            [[1,0], [2,1], [2,2], [2,3], [1,4]],
+            // Line 8: Diagonal down-right
+            [[0,0], [0,1], [1,2], [2,3], [2,4]],
+            // Line 9: Diagonal up-right
+            [[2,0], [2,1], [1,2], [0,3], [0,4]],
+            // Line 10: Center zig-zag
+            [[1,0], [1,1], [0,2], [1,3], [1,4]]
+        ];
+
+        // Complex Slot Game State
+        const complexGameState = {
+            selectedCause: null,
+            betAmount: 0,
+            impactPoints: 0,
+            spinsPlayed: 0,
+            wins: 0,
+            vaultsUnlocked: 0,
+            totalImpact: 0,
+            grid: Array(GRID_ROWS).fill(null).map(() => Array(GRID_COLS).fill(null))
+        };
+
+        // Complex Slot DOM Elements
+        const complexGridContainer = document.getElementById('complexGridContainer');
+        const spinButtonComplex = document.getElementById('spinButtonComplex');
+        const betInputComplex = document.getElementById('betInputComplex');
+        const betMaxButtonComplex = document.getElementById('betMaxButtonComplex');
+        const betAmountDisplayComplex = document.getElementById('betAmountDisplayComplex');
+        const betPercentageComplex = document.getElementById('betPercentageComplex');
+        const showPaylinesToggle = document.getElementById('showPaylinesToggle');
+        const paylineOverlay = document.getElementById('paylineOverlay');
+        const complexWinSummary = document.getElementById('complexWinSummary');
+        const complexWinMessage = document.getElementById('complexWinMessage');
+        const causesContainerComplex = document.getElementById('causesContainerComplex');
+
+        // Initialize Complex Grid
+        function initializeComplexGrid() {
+            complexGridContainer.innerHTML = '';
+            
+            // Create SVG overlay for paylines
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.className = 'payline-overlay';
+            svg.id = 'paylineOverlay';
+            svg.style.display = 'none';
+            complexGridContainer.appendChild(svg);
+
+            // Create grid cells
+            for (let row = 0; row < GRID_ROWS; row++) {
+                for (let col = 0; col < GRID_COLS; col++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'complex-symbol-cell';
+                    cell.id = `cell-${row}-${col}`;
+                    cell.dataset.row = row;
+                    cell.dataset.col = col;
+                    // Set initial random symbol
+                    const randomSymbol = complexSymbolArray[Math.floor(Math.random() * complexSymbolArray.length)];
+                    cell.textContent = randomSymbol;
+                    complexGameState.grid[row][col] = randomSymbol;
+                    complexGridContainer.appendChild(cell);
+                }
+            }
+        }
+
+        // Check payline for win (all 5 symbols identical)
+        function checkPayline(payline) {
+            const symbols = payline.map(([row, col]) => complexGameState.grid[row][col]);
+            const firstSymbol = symbols[0];
+            return symbols.every(symbol => symbol === firstSymbol);
+        }
+
+        // Check all paylines and return winning ones
+        function checkAllPaylines() {
+            const winningPaylines = [];
+            PAYLINES.forEach((payline, index) => {
+                if (checkPayline(payline)) {
+                    winningPaylines.push({
+                        lineNumber: index + 1,
+                        positions: payline,
+                        symbol: complexGameState.grid[payline[0][0]][payline[0][1]],
+                        multiplier: complexSymbols[complexGameState.grid[payline[0][0]][payline[0][1]]].multiplier
+                    });
+                }
+            });
+            return winningPaylines;
+        }
+
+        // Calculate payout
+        function calculatePayout(winningPaylines, betAmount) {
+            const betPerLine = betAmount / 10; // 10 paylines
+            let totalPayout = 0;
+            
+            winningPaylines.forEach(win => {
+                const linePayout = betPerLine * win.multiplier;
+                totalPayout += linePayout;
+            });
+            
+            return totalPayout;
+        }
+
+        // Draw paylines on SVG overlay
+        function drawPaylines(winningPaylines = []) {
+            const svg = paylineOverlay;
+            svg.innerHTML = '';
+            
+            // Get actual grid container dimensions
+            const containerRect = complexGridContainer.getBoundingClientRect();
+            svg.setAttribute('width', containerRect.width);
+            svg.setAttribute('height', containerRect.height);
+            svg.setAttribute('viewBox', `0 0 ${containerRect.width} ${containerRect.height}`);
+            
+            PAYLINES.forEach((payline, index) => {
+                const isWinning = winningPaylines.some(w => w.lineNumber === index + 1);
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                
+                let pathData = '';
+                payline.forEach(([row, col], i) => {
+                    const cell = document.getElementById(`cell-${row}-${col}`);
+                    if (cell) {
+                        const cellRect = cell.getBoundingClientRect();
+                        const containerRect = complexGridContainer.getBoundingClientRect();
+                        const x = cellRect.left - containerRect.left + cellRect.width / 2;
+                        const y = cellRect.top - containerRect.top + cellRect.height / 2;
+                        if (i === 0) {
+                            pathData = `M ${x} ${y}`;
+                        } else {
+                            pathData += ` L ${x} ${y}`;
+                        }
+                    }
+                });
+                
+                path.setAttribute('d', pathData);
+                path.setAttribute('class', 'payline-path');
+                if (isWinning) {
+                    path.setAttribute('stroke', '#4ade80');
+                    path.setAttribute('stroke-width', '4');
+                } else {
+                    path.setAttribute('stroke', 'rgba(212, 175, 55, 0.4)');
+                    path.setAttribute('stroke-width', '2');
+                }
+                svg.appendChild(path);
+            });
+        }
+
+        // Show/hide paylines
+        showPaylinesToggle.addEventListener('click', () => {
+            const isActive = showPaylinesToggle.classList.contains('active');
+            if (isActive) {
+                paylineOverlay.style.display = 'none';
+                showPaylinesToggle.classList.remove('active');
+                showPaylinesToggle.textContent = 'Show Paylines';
+            } else {
+                paylineOverlay.style.display = 'block';
+                // Wait a bit for grid to be fully rendered
+                setTimeout(() => {
+                    const winningPaylines = checkAllPaylines();
+                    drawPaylines(winningPaylines);
+                }, 100);
+                showPaylinesToggle.classList.add('active');
+                showPaylinesToggle.textContent = 'Hide Paylines';
+            }
+        });
+
+        // Complex Slot Spin Function
+        async function spinComplex() {
+            if (!complexGameState.selectedCause || complexGameState.betAmount <= 0) return;
+
+            spinButtonComplex.disabled = true;
+            betInputComplex.disabled = true;
+            complexWinSummary.style.display = 'none';
+
+            // Animate spinning
+            const cells = complexGridContainer.querySelectorAll('.complex-symbol-cell');
+            cells.forEach(cell => {
+                cell.classList.add('spinning');
+            });
+
+            // Generate random symbols for grid
+            for (let row = 0; row < GRID_ROWS; row++) {
+                for (let col = 0; col < GRID_COLS; col++) {
+                    const randomSymbol = complexSymbolArray[Math.floor(Math.random() * complexSymbolArray.length)];
+                    complexGameState.grid[row][col] = randomSymbol;
+                }
+            }
+
+            // Wait for animation
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+            // Stop spinning and update display
+            cells.forEach((cell, index) => {
+                const row = Math.floor(index / GRID_COLS);
+                const col = index % GRID_COLS;
+                cell.textContent = complexGameState.grid[row][col];
+                cell.classList.remove('spinning');
+            });
+
+            // Check for wins
+            const winningPaylines = checkAllPaylines();
+            const isWin = winningPaylines.length > 0;
+            
+            complexGameState.spinsPlayed++;
+
+            // Update payline overlay if visible
+            if (paylineOverlay.style.display === 'block') {
+                setTimeout(() => drawPaylines(winningPaylines), 100);
+            }
+
+            if (isWin) {
+                const totalPayout = calculatePayout(winningPaylines, complexGameState.betAmount);
+                const donationAmount = (complexGameState.betAmount * DONATION_PERCENTAGE) / 100;
+                
+                // Highlight winning cells
+                winningPaylines.forEach(win => {
+                    win.positions.forEach(([row, col]) => {
+                        const cell = document.getElementById(`cell-${row}-${col}`);
+                        cell.classList.add('winning');
+                        setTimeout(() => cell.classList.remove('winning'), 2000);
+                    });
+                });
+
+                // Update win summary
+                complexWinSummary.classList.add('win');
+                complexWinSummary.style.display = 'block';
+                complexWinMessage.innerHTML = `
+                    <div style="font-size: 1.3rem; color: #4ade80; font-weight: 700; margin-bottom: 10px;">
+                        🎉 You won on ${winningPaylines.length} payline${winningPaylines.length > 1 ? 's' : ''}!
+                    </div>
+                    <div style="font-size: 1.1rem; color: #ffd700; margin-bottom: 8px;">
+                        Total Payout: $${totalPayout.toFixed(2)}
+                    </div>
+                    <div style="font-size: 0.9rem; color: #aaa;">
+                        Donation: $${donationAmount.toFixed(2)} (${DONATION_PERCENTAGE}% of $${complexGameState.betAmount.toLocaleString()}) to cause
+                    </div>
+                `;
+
+                // Update impact points (scaled)
+                const baseImpact = complexGameState.betAmount / 100;
+                const impactGained = Math.floor(baseImpact * 20 * winningPaylines.length);
+                complexGameState.impactPoints += impactGained;
+                complexGameState.totalImpact += impactGained;
+                complexGameState.wins++;
+            } else {
+                const donationAmount = (complexGameState.betAmount * DONATION_PERCENTAGE) / 100;
+                const baseImpact = complexGameState.betAmount / 100;
+                const impactGained = Math.floor(baseImpact * 5);
+                complexGameState.impactPoints += impactGained;
+                complexGameState.totalImpact += impactGained;
+
+                complexWinSummary.classList.remove('win');
+                complexWinSummary.style.display = 'block';
+                complexWinMessage.innerHTML = `
+                    <div style="font-size: 1.1rem; color: #fbbf24; margin-bottom: 8px;">
+                        No winning paylines this spin
+                    </div>
+                    <div style="font-size: 0.9rem; color: #aaa;">
+                        Donation: $${donationAmount.toFixed(2)} (${DONATION_PERCENTAGE}% of $${complexGameState.betAmount.toLocaleString()}) to cause
+                    </div>
+                `;
+            }
+
+            // Update UI
+            updateComplexProgress();
+            updateComplexStats();
+            betInputComplex.disabled = false;
+            updateComplexSpinButtonState();
+
+            // Check for vault unlock
+            if (complexGameState.impactPoints >= 100) {
+                setTimeout(() => {
+                    unlockComplexVault();
+                }, 1000);
+            }
+        }
+
+        // Complex Slot Helper Functions
+        function updateComplexBetDisplay() {
+            const bet = complexGameState.betAmount;
+            betAmountDisplayComplex.textContent = `Bet: $${bet.toLocaleString()}`;
+            betPercentageComplex.textContent = `${DONATION_PERCENTAGE}%`;
+            updateComplexSpinButtonState();
+        }
+
+        function updateComplexSpinButtonState() {
+            const hasCause = complexGameState.selectedCause !== null;
+            const hasBet = complexGameState.betAmount > 0 && complexGameState.betAmount <= 10000;
+            spinButtonComplex.disabled = !(hasCause && hasBet);
+        }
+
+        function updateComplexProgress() {
+            const percentage = Math.min(complexGameState.impactPoints, 100);
+            document.getElementById('progressBarComplex').style.width = `${percentage}%`;
+            document.getElementById('progressPercentageComplex').textContent = `${percentage}%`;
+            document.getElementById('progressTextComplex').textContent = `${complexGameState.impactPoints} / 100`;
+        }
+
+        function updateComplexStats() {
+            document.getElementById('spinsPlayedComplex').textContent = complexGameState.spinsPlayed;
+            document.getElementById('winsComplex').textContent = complexGameState.wins;
+            document.getElementById('vaultsUnlockedComplex').textContent = complexGameState.vaultsUnlocked;
+            document.getElementById('totalImpactComplex').textContent = complexGameState.totalImpact;
+        }
+
+        function unlockComplexVault() {
+            complexGameState.vaultsUnlocked++;
+            complexGameState.impactPoints = 0;
+            updateComplexProgress();
+            updateComplexStats();
+            alert('Vault Unlocked! 🎉');
+        }
+
+        // Complex Slot Event Listeners
+        betInputComplex.addEventListener('input', (e) => {
+            let bet = parseInt(e.target.value) || 0;
+            if (bet > 10000) {
+                bet = 10000;
+                betInputComplex.value = 10000;
+            }
+            complexGameState.betAmount = bet;
+            updateComplexBetDisplay();
+        });
+
+        betMaxButtonComplex.addEventListener('click', () => {
+            betInputComplex.value = 10000;
+            complexGameState.betAmount = 10000;
+            updateComplexBetDisplay();
+        });
+
+        spinButtonComplex.addEventListener('click', spinComplex);
+
+        // Complex Cause Selection
+        causesContainerComplex.addEventListener('click', (e) => {
+            const causeOption = e.target.closest('.cause-option');
+            if (!causeOption) return;
+            const causeId = causeOption.dataset.cause;
+            complexGameState.selectedCause = causeId;
+            
+            document.querySelectorAll('#causesContainerComplex .cause-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            causeOption.classList.add('selected');
+            
+            document.getElementById('selectedCauseNameComplex').textContent = 
+                `${causes[causeId].emoji} ${causes[causeId].name}`;
+            updateComplexSpinButtonState();
+        });
+
+        // Complex Help Modal
+        const complexHelpButton = document.getElementById('complexHelpButton');
+        const complexHelpOverlay = document.getElementById('complexHelpOverlay');
+        const complexHelpClose = document.getElementById('complexHelpClose');
+
+        complexHelpButton.addEventListener('click', () => {
+            complexHelpOverlay.classList.add('active');
+        });
+
+        complexHelpClose.addEventListener('click', () => {
+            complexHelpOverlay.classList.remove('active');
+        });
+
+        complexHelpOverlay.addEventListener('click', (e) => {
+            if (e.target === complexHelpOverlay) {
+                complexHelpOverlay.classList.remove('active');
+            }
+        });
+
+        // Initialize Complex Grid on page load
+        initializeComplexGrid();
     </script>
 </body>
 </html>
