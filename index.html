@@ -2842,13 +2842,13 @@
         const complexWinMessage = document.getElementById('complexWinMessage');
         const causesContainerComplex = document.getElementById('causesContainerComplex');
 
-        // Initialize Complex Grid
+        // Initialize Complex Grid - Simple one icon per cell
         function initializeComplexGrid() {
             // Clear container completely
             complexGridContainer.innerHTML = '';
             complexGridContainer.textContent = '';
             
-            // Create grid cells with strips for spinning
+            // Create grid cells - simple one icon per cell
             for (let row = 0; row < GRID_ROWS; row++) {
                 for (let col = 0; col < GRID_COLS; col++) {
                     const cell = document.createElement('div');
@@ -2857,33 +2857,17 @@
                     cell.dataset.row = row;
                     cell.dataset.col = col;
                     
-                    // Ensure cell has no text content
-                    cell.textContent = '';
-                    
-                    // Create strip with multiple symbols
-                    const strip = document.createElement('div');
-                    strip.className = 'complex-symbol-strip';
-                    strip.id = `strip-${row}-${col}`;
-                    
-                    // Set initial random symbol in grid state first
+                    // Set initial random symbol in grid state
                     const randomSymbol = complexSymbolWeightedArray[Math.floor(Math.random() * complexSymbolWeightedArray.length)];
                     complexGameState.grid[row][col] = randomSymbol;
                     
-                    // Add 20 symbol instances for smooth scrolling
-                    for (let i = 0; i < 20; i++) {
-                        const symbolItem = document.createElement('div');
-                        symbolItem.className = 'complex-symbol-item';
-                        // Use weighted selection for variety, but first one matches grid state
-                        const symbol = (i === 0) ? randomSymbol : complexSymbolWeightedArray[Math.floor(Math.random() * complexSymbolWeightedArray.length)];
-                        symbolItem.textContent = symbol;
-                        strip.appendChild(symbolItem);
-                    }
+                    // Create simple symbol display (one icon per cell)
+                    const symbolDisplay = document.createElement('div');
+                    symbolDisplay.className = 'complex-symbol-display';
+                    symbolDisplay.id = `symbol-${row}-${col}`;
+                    symbolDisplay.textContent = randomSymbol;
                     
-                    cell.appendChild(strip);
-                    
-                    // Position strip to show the initial symbol (first symbol visible)
-                    strip.style.transform = 'translateY(0px)';
-                    
+                    cell.appendChild(symbolDisplay);
                     complexGridContainer.appendChild(cell);
                 }
             }
