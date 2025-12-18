@@ -376,6 +376,169 @@
             background: linear-gradient(to top, rgba(26, 26, 46, 0.9), transparent);
         }
 
+        .bet-section {
+            margin: 25px 0;
+            text-align: center;
+        }
+
+        .bet-label {
+            color: #d4af37;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .bet-input-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .bet-currency {
+            color: #d4af37;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .bet-input {
+            background: rgba(15, 52, 96, 0.8);
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            border-radius: 10px;
+            color: #e0e0e0;
+            font-size: 1.5rem;
+            font-weight: 700;
+            padding: 15px 20px;
+            width: 200px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .bet-input:focus {
+            outline: none;
+            border-color: #d4af37;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+            background: rgba(15, 52, 96, 1);
+        }
+
+        .bet-input::placeholder {
+            color: #666;
+        }
+
+        .bet-info {
+            color: #aaa;
+            font-size: 0.9rem;
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        .bet-impact {
+            color: #4ade80;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        /* Bet Input Section */
+        .bet-section {
+            margin: 25px 0;
+            padding: 20px;
+            background: rgba(15, 52, 96, 0.4);
+            border-radius: 12px;
+            border: 2px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .bet-label {
+            color: #d4af37;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .bet-input-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .bet-currency {
+            color: #d4af37;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .bet-input {
+            background: rgba(26, 26, 46, 0.8);
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-size: 1.5rem;
+            font-weight: 700;
+            padding: 12px 20px;
+            width: 180px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .bet-input:focus {
+            outline: none;
+            border-color: #d4af37;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+        }
+
+        .bet-input::placeholder {
+            color: #666;
+        }
+
+        .bet-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .bet-amount-display {
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        .bet-percentage {
+            color: #ffd700;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .bet-percentage-label {
+            color: #aaa;
+            font-size: 0.85rem;
+            margin-left: 5px;
+        }
+
+        .bet-max-button {
+            background: rgba(212, 175, 55, 0.2);
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            color: #d4af37;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-left: 10px;
+        }
+
+        .bet-max-button:hover {
+            background: rgba(212, 175, 55, 0.3);
+            transform: scale(1.05);
+        }
+
         .spin-button {
             background: linear-gradient(135deg, #d4af37 0%, #ffd700 100%);
             border: none;
@@ -912,6 +1075,27 @@
                 font-size: 2.5rem;
             }
 
+            .bet-section {
+                padding: 15px;
+                margin: 20px 0;
+            }
+
+            .bet-input {
+                width: 140px;
+                font-size: 1.2rem;
+                padding: 10px 15px;
+            }
+
+            .bet-currency {
+                font-size: 1.3rem;
+            }
+
+            .bet-info {
+                flex-direction: column;
+                gap: 8px;
+                align-items: flex-start;
+            }
+
             .spin-button {
                 padding: 15px 40px;
                 font-size: 1.2rem;
@@ -1003,6 +1187,33 @@
                         <div class="reel-strip" id="reelStrip5"></div>
                     </div>
                 </div>
+                
+                <!-- Bet Input Section -->
+                <div class="bet-section">
+                    <label class="bet-label" for="betInput">Place Your Bet</label>
+                    <div class="bet-input-container">
+                        <span class="bet-currency">$</span>
+                        <input 
+                            type="number" 
+                            id="betInput" 
+                            class="bet-input" 
+                            placeholder="0" 
+                            min="1" 
+                            max="10000" 
+                            step="1"
+                            value=""
+                        >
+                        <button class="bet-max-button" id="betMaxButton">MAX</button>
+                    </div>
+                    <div class="bet-info">
+                        <span class="bet-amount-display" id="betAmountDisplay">Bet: $0</span>
+                        <span>
+                            <span class="bet-percentage" id="betPercentage">0%</span>
+                            <span class="bet-percentage-label">to cause</span>
+                        </span>
+                    </div>
+                </div>
+                
                 <button class="spin-button" id="spinButton" disabled>SPIN</button>
                 <div class="result-message" id="resultMessage"></div>
             </div>
@@ -1112,12 +1323,16 @@
         // Game State
         const gameState = {
             selectedCause: null,
+            betAmount: 0,
             impactPoints: 0,
             spinsPlayed: 0,
             wins: 0,
             vaultsUnlocked: 0,
             totalImpact: 0
         };
+
+        // Donation percentage (5% of bet goes to cause)
+        const DONATION_PERCENTAGE = 5;
 
         // Cause definitions with detailed information
         const causes = {
@@ -1240,6 +1455,10 @@
         const causeDetailsContent = document.getElementById('causeDetailsContent');
         const causeDetailsClose = document.getElementById('causeDetailsClose');
         const causeDetailsSelect = document.getElementById('causeDetailsSelect');
+        const betInput = document.getElementById('betInput');
+        const betMaxButton = document.getElementById('betMaxButton');
+        const betAmountDisplay = document.getElementById('betAmountDisplay');
+        const betPercentage = document.getElementById('betPercentage');
         const statsElements = {
             spinsPlayed: document.getElementById('spinsPlayed'),
             wins: document.getElementById('wins'),
@@ -1247,16 +1466,55 @@
             totalImpact: document.getElementById('totalImpact')
         };
 
+        // Update bet display and percentage
+        function updateBetDisplay() {
+            const bet = gameState.betAmount;
+            const donationAmount = (bet * DONATION_PERCENTAGE) / 100;
+            
+            betAmountDisplay.textContent = `Bet: $${bet.toLocaleString()}`;
+            betPercentage.textContent = `${DONATION_PERCENTAGE}%`;
+            
+            // Update spin button state
+            updateSpinButtonState();
+        }
+        
+        // Update spin button enabled/disabled state
+        function updateSpinButtonState() {
+            const hasCause = gameState.selectedCause !== null;
+            const hasBet = gameState.betAmount > 0 && gameState.betAmount <= 10000;
+            spinButton.disabled = !(hasCause && hasBet);
+        }
+        
+        // Handle bet input
+        function handleBetInput(value) {
+            let bet = parseInt(value) || 0;
+            
+            // Validate and clamp to max
+            if (bet > 10000) {
+                bet = 10000;
+                betInput.value = 10000;
+            } else if (bet < 0) {
+                bet = 0;
+                betInput.value = '';
+            }
+            
+            gameState.betAmount = bet;
+            updateBetDisplay();
+            saveState();
+        }
+
         // Clear state on page load (fresh start every time)
         function clearState() {
             localStorage.removeItem('vaultGameState');
             // Reset game state to initial values
             gameState.selectedCause = null;
+            gameState.betAmount = 0;
             gameState.impactPoints = 0;
             gameState.spinsPlayed = 0;
             gameState.wins = 0;
             gameState.vaultsUnlocked = 0;
             gameState.totalImpact = 0;
+            betInput.value = '';
             updateUI();
         }
 
@@ -1328,18 +1586,20 @@
         // Select cause from modal
         function selectCauseFromModal(causeId) {
             gameState.selectedCause = causeId;
-            
+
             // Update UI
             document.querySelectorAll('.cause-option').forEach(opt => {
                 opt.classList.remove('selected');
             });
             const causeOption = document.querySelector(`[data-cause="${causeId}"]`);
             if (causeOption) {
-                causeOption.classList.add('selected');
+            causeOption.classList.add('selected');
             }
-            
+
             selectedCauseName.textContent = `${causes[causeId].emoji} ${causes[causeId].name}`;
-            spinButton.disabled = false;
+
+            // Update spin button state (requires both cause and bet)
+            updateSpinButtonState();
             
             closeCauseDetails();
             saveState();
@@ -1373,15 +1633,16 @@
         // Show spin result popup
         function showSpinResult(isWin) {
             const cause = causes[gameState.selectedCause];
+            const donationAmount = (gameState.betAmount * DONATION_PERCENTAGE) / 100;
             
             if (isWin) {
                 spinResultTitle.textContent = 'You Won! 🎉';
-                spinResultText.textContent = `You won and we are adding 5% to the cause ${cause.name}.`;
+                spinResultText.textContent = `You won! We're donating $${donationAmount.toFixed(2)} (${DONATION_PERCENTAGE}% of your $${gameState.betAmount.toLocaleString()} bet) to ${cause.name}.`;
                 spinResultModal.classList.remove('loss');
                 spinResultModal.classList.add('win');
             } else {
                 spinResultTitle.textContent = 'Keep Trying';
-                spinResultText.textContent = `Your spin for a cause did not win, but we are donating 5% of the value to ${cause.name}.`;
+                spinResultText.textContent = `Your spin didn't win this time, but we're still donating $${donationAmount.toFixed(2)} (${DONATION_PERCENTAGE}% of your $${gameState.betAmount.toLocaleString()} bet) to ${cause.name}.`;
                 spinResultModal.classList.remove('win');
                 spinResultModal.classList.add('loss');
             }
@@ -1399,7 +1660,9 @@
                     unlockVault();
                 }, 500);
             } else {
-                spinButton.disabled = false;
+                // Re-enable controls
+                updateSpinButtonState();
+                betInput.disabled = false;
             }
         }
 
@@ -1492,9 +1755,10 @@
 
         // Spin function with cascading reel stops
         async function spin() {
-            if (!gameState.selectedCause) return;
+            if (!gameState.selectedCause || gameState.betAmount <= 0) return;
 
             spinButton.disabled = true;
+            betInput.disabled = true;
             resultMessage.textContent = '';
             resultMessage.className = 'result-message';
 
@@ -1535,31 +1799,41 @@
             // Small delay before showing results
             await new Promise(resolve => setTimeout(resolve, 300));
 
-            gameState.spinsPlayed++;
-            let impactGained = 0;
+                gameState.spinsPlayed++;
+            
+            // Calculate donation amount (5% of bet)
+            const donationAmount = (gameState.betAmount * DONATION_PERCENTAGE) / 100;
+            
+            // Impact points based on bet amount (scaled)
+            // Win: 20 points per $100 bet, Loss: 5 points per $100 bet
+            const baseImpact = gameState.betAmount / 100;
+                let impactGained = 0;
 
-            if (isWin) {
-                impactGained = 20;
-                gameState.wins++;
-                resultMessage.textContent = '🎉 Victory! Legacy strengthened!';
-                resultMessage.classList.add('win');
-            } else {
-                impactGained = 5;
-                resultMessage.textContent = 'Legacy grows even in failure';
-                resultMessage.classList.add('loss');
-            }
+                if (isWin) {
+                impactGained = Math.floor(baseImpact * 20);
+                    gameState.wins++;
+                resultMessage.textContent = `🎉 Victory! $${donationAmount.toFixed(2)} to cause!`;
+                    resultMessage.classList.add('win');
+                } else {
+                impactGained = Math.floor(baseImpact * 5);
+                resultMessage.textContent = `Legacy grows! $${donationAmount.toFixed(2)} to cause`;
+                    resultMessage.classList.add('loss');
+                }
 
-            gameState.impactPoints += impactGained;
-            gameState.totalImpact += impactGained;
+                gameState.impactPoints += impactGained;
+                gameState.totalImpact += impactGained;
+            
+            // Re-enable bet input after spin
+            betInput.disabled = false;
 
-            updateProgress();
-            updateStats();
-            saveState();
+                updateProgress();
+                updateStats();
+                saveState();
 
-            // Show spin result popup
-            setTimeout(() => {
-                showSpinResult(isWin);
-            }, 500);
+                // Show spin result popup
+                setTimeout(() => {
+                    showSpinResult(isWin);
+                }, 500);
         }
 
         // Event listeners for spin result modal
@@ -1615,6 +1889,24 @@
             saveState();
         });
 
+        // Bet input event listeners
+        betInput.addEventListener('input', (e) => {
+            handleBetInput(e.target.value);
+        });
+        
+        betInput.addEventListener('blur', (e) => {
+            if (!e.target.value || e.target.value === '0') {
+                e.target.value = '';
+                gameState.betAmount = 0;
+                updateBetDisplay();
+            }
+        });
+        
+        betMaxButton.addEventListener('click', () => {
+            betInput.value = 10000;
+            handleBetInput(10000);
+        });
+
         // Spin button event
         spinButton.addEventListener('click', spin);
 
@@ -1625,7 +1917,11 @@
                 opt.classList.remove('selected');
             });
             selectedCauseName.textContent = 'Select a cause to begin';
-            spinButton.disabled = true;
+            
+            // Reset bet display
+            betInput.value = '';
+            gameState.betAmount = 0;
+            updateBetDisplay();
 
             updateProgress();
             updateStats();
