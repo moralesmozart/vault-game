@@ -2672,24 +2672,44 @@
             updateStats();
         }
 
-        // Handle modal choices
+        // Handle modal choices (works for both basic and complex modes)
         modalOverlay.addEventListener('click', (e) => {
             const choiceButton = e.target.closest('.choice-button');
             if (!choiceButton) return;
 
             const amplify = parseInt(choiceButton.dataset.amplify);
             
-            // Visual feedback only (no actual logic needed for MVP)
-            if (amplify > 0) {
-                console.log(`Amplified cause by ${amplify}%`);
-            }
+            // Check which tab is active
+            const complexTab = document.getElementById('tab-complex');
+            const isComplexMode = complexTab && complexTab.classList.contains('active');
+            
+            if (isComplexMode) {
+                // Complex mode
+                // Visual feedback only (no actual logic needed for MVP)
+                if (amplify > 0) {
+                    console.log(`Amplified cause by ${amplify}%`);
+                }
 
-            // Reset progress and close modal
-            gameState.impactPoints = 0;
-            updateProgress();
-            modalOverlay.classList.remove('active');
-            spinButton.disabled = false;
-            saveState();
+                // Reset progress and close modal
+                complexGameState.impactPoints = 0;
+                updateComplexProgress();
+                modalOverlay.classList.remove('active');
+                spinButtonComplex.disabled = false;
+                betInputComplex.disabled = false;
+            } else {
+                // Basic mode
+                // Visual feedback only (no actual logic needed for MVP)
+                if (amplify > 0) {
+                    console.log(`Amplified cause by ${amplify}%`);
+                }
+
+                // Reset progress and close modal
+                gameState.impactPoints = 0;
+                updateProgress();
+                modalOverlay.classList.remove('active');
+                spinButton.disabled = false;
+                saveState();
+            }
         });
 
         // Bet input event listeners
@@ -3214,10 +3234,10 @@
 
         function unlockComplexVault() {
             complexGameState.vaultsUnlocked++;
-            complexGameState.impactPoints = 0;
-            updateComplexProgress();
+            const cause = causes[complexGameState.selectedCause];
+            modalText.textContent = `Your dedication has opened a new chamber in the Vault. The legacy you're building continues to grow, creating lasting impact for ${cause.name}.`;
+            modalOverlay.classList.add('active');
             updateComplexStats();
-            alert('Vault Unlocked! 🎉');
         }
 
         // Complex Slot Event Listeners
