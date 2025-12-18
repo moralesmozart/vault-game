@@ -1218,18 +1218,35 @@
             background: rgba(26, 26, 46, 0.8);
             border: 2px solid rgba(212, 175, 55, 0.3);
             border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
             position: relative;
             overflow: hidden;
             transition: all 0.3s ease;
         }
 
-        .complex-symbol-cell.spinning {
+        .complex-symbol-strip {
+            position: absolute;
+            width: 100%;
+            top: 0;
+            left: 0;
+            transition: transform 0.1s linear;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .complex-symbol-cell.spinning .complex-symbol-strip {
+            transition: none;
             filter: blur(2px);
             animation: spinGlow 0.3s ease-in-out infinite alternate;
+        }
+
+        .complex-symbol-item {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            flex-shrink: 0;
         }
 
         .complex-symbol-cell.winning {
@@ -1454,6 +1471,40 @@
 
             .stats-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .complex-grid-container {
+                gap: 6px;
+                padding: 15px;
+            }
+
+            .complex-symbol-cell {
+                font-size: 2rem;
+            }
+
+            .complex-help-button {
+                font-size: 0.75rem;
+                padding: 6px 12px;
+                margin-top: 10px;
+            }
+
+            #complexHelpOverlay .modal {
+                max-width: 95% !important;
+                max-height: 95vh !important;
+                padding: 15px !important;
+            }
+
+            #complexHelpOverlay .modal-text {
+                font-size: 0.85rem !important;
+            }
+
+            #complexHelpOverlay table {
+                font-size: 0.75rem !important;
+            }
+
+            #complexHelpOverlay th,
+            #complexHelpOverlay td {
+                padding: 4px !important;
             }
         }
     </style>
@@ -1885,32 +1936,43 @@
 
     <!-- Complex Slot Help Modal -->
     <div class="modal-overlay" id="complexHelpOverlay">
-        <div class="modal" style="max-width: 700px;">
-            <h2>How Paylines Work</h2>
-            <div class="modal-text" style="text-align: left;">
-                <p style="margin-bottom: 15px;"><strong>The Complex Vault Slot has 10 fixed paylines.</strong></p>
-                <p style="margin-bottom: 15px;">A payline wins when <strong>all 5 symbols on that line are identical</strong>.</p>
+        <div class="modal" style="max-width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; padding: 20px; position: relative;">
+            <button class="cause-close-button" style="position: absolute; top: 10px; right: 10px; padding: 8px 15px; font-size: 0.9rem;" onclick="document.getElementById('complexHelpOverlay').classList.remove('active')">✕</button>
+            <h2 style="margin-top: 0;">How Paylines Work</h2>
+            <div class="modal-text" style="text-align: left; font-size: 0.9rem; line-height: 1.6;">
+                <p style="margin-bottom: 12px;"><strong>The Complex Vault Slot has 10 fixed paylines.</strong></p>
+                <p style="margin-bottom: 15px;">A payline wins when you get <strong>3, 4, or 5 matching symbols in a row</strong> (left to right).</p>
                 
-                <h3 style="color: #d4af37; margin-top: 20px; margin-bottom: 10px;">Symbol Multipliers:</h3>
-                <ul style="list-style: none; padding: 0;">
-                    <li style="padding: 5px 0;">🔥 Torch: ×1.1</li>
-                    <li style="padding: 5px 0;">📜 Scroll: ×1.2</li>
-                    <li style="padding: 5px 0;">🧭 Compass: ×1.3</li>
-                    <li style="padding: 5px 0;">🏺 Coin: ×1.4</li>
-                    <li style="padding: 5px 0;">🌍 Globe: ×1.5</li>
-                    <li style="padding: 5px 0;">🗝️ Key: ×1.6</li>
-                    <li style="padding: 5px 0;">⭐ Legacy Star: ×1.8</li>
-                    <li style="padding: 5px 0;">💎 Vault Gem: ×2.0</li>
-                </ul>
+                <h3 style="color: #d4af37; margin-top: 15px; margin-bottom: 8px; font-size: 1rem;">Payout Table (per line):</h3>
+                <div style="overflow-x: auto; margin-bottom: 15px;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+                        <thead>
+                            <tr style="background: rgba(212, 175, 55, 0.2);">
+                                <th style="padding: 8px; text-align: left; border: 1px solid rgba(212, 175, 55, 0.3);">Symbol</th>
+                                <th style="padding: 8px; text-align: center; border: 1px solid rgba(212, 175, 55, 0.3);">3 Match</th>
+                                <th style="padding: 8px; text-align: center; border: 1px solid rgba(212, 175, 55, 0.3);">4 Match</th>
+                                <th style="padding: 8px; text-align: center; border: 1px solid rgba(212, 175, 55, 0.3);">5 Match</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td style="padding: 6px; border: 1px solid rgba(212, 175, 55, 0.2);">🔥 Torch</td><td style="padding: 6px; text-align: center; border: 1px solid rgba(212, 175, 55, 0.2);">×1.1</td><td style="padding: 6px; text-align: center; border: 1px solid rgba(212, 175, 55, 0.2);">×2.2</td><td style="padding: 6px; text-align: center; border: 1px solid rgba(212, 175, 55, 0.2);">×3.3</td></tr>
+                            <tr><td style="padding: 6px; border: 1px solid rgba(212, 175, 55, 0.2);">📜 Scroll</td><td style="padding: 6px; text-align: center; border: 1px solid rgba(212, 175, 55, 0.2);">×1.2</td><td style="padding: 6px; text-align: center; border: 1px solid rgba(212, 175, 55, 0.2);">×2.4</td><td style="padding: 6px; text-align: center; border: 1px solid rgba(212, 175, 55, 0.2);">×4.8</td></tr>
+                            <tr><td style="padding: 6px; border: 1px solid rgba(212, 175, 55, 0.2);">🧭 Compass</td><td style="padding: 6px; text-align: center; border: 1px solid rgba(212, 175, 55, 0.2);">×1.3</td><td style="padding: 6px; text-align: center; border: 1px solid rgba(212, 175, 55, 0.2);">×2.6</td><td style="padding: 6px; text-align: center; border: 1px solid rgba(212, 175, 55, 0.2);">×5.2</td></tr>
+                            <tr><td style="padding: 6px; border: 1px solid rgba(212, 175, 55, 0.2);">🏺 Coin</td><td style="padding: 6px; text-align: center; border: 1px solid rgba(212, 175, 55, 0.2);">×1.4</td><td style="padding: 6px; text-align: center; border: 1px solid rgba(212, 175, 55, 0.2);">×2.8</td><td style="padding: 6px; text-align: center; border: 1px solid rgba(212, 175, 55, 0.2);">×5.6</td></tr>
+                            <tr><td style="padding: 6px; border: 1px solid rgba(212, 175, 55, 0.2);">🌍 Globe</td><td style="padding: 6px; text-align: center; border: 1px solid rgba(212, 175, 55, 0.2);">×1.5</td><td style="padding: 6px; text-align: center; border: 1px solid rgba(212, 175, 55, 0.2);">×3.0</td><td style="padding: 6px; text-align: center; border: 1px solid rgba(212, 175, 55, 0.2);">×6.0</td></tr>
+                            <tr><td style="padding: 6px; border: 1px solid rgba(212, 175, 55, 0.2);">🗝️ Key</td><td style="padding: 6px; text-align: center; border: 1px solid rgba(212, 175, 55, 0.2);">×1.6</td><td style="padding: 6px; text-align: center; border: 1px solid rgba(212, 175, 55, 0.2);">×3.2</td><td style="padding: 6px; text-align: center; border: 1px solid rgba(212, 175, 55, 0.2);">×6.4</td></tr>
+                            <tr><td style="padding: 6px; border: 1px solid rgba(212, 175, 55, 0.2);">⭐ Legacy Star</td><td style="padding: 6px; text-align: center; border: 1px solid rgba(212, 175, 55, 0.2);">×1.8</td><td style="padding: 6px; text-align: center; border: 1px solid rgba(212, 175, 55, 0.2);">×3.6</td><td style="padding: 6px; text-align: center; border: 1px solid rgba(212, 175, 55, 0.2);">×7.2</td></tr>
+                            <tr><td style="padding: 6px; border: 1px solid rgba(212, 175, 55, 0.2);">💎 Vault Gem</td><td style="padding: 6px; text-align: center; border: 1px solid rgba(212, 175, 55, 0.2);">×2.0</td><td style="padding: 6px; text-align: center; border: 1px solid rgba(212, 175, 55, 0.2);">×4.0</td><td style="padding: 6px; text-align: center; border: 1px solid rgba(212, 175, 55, 0.2); color: #4ade80; font-weight: 700;">×8.0</td></tr>
+                        </tbody>
+                    </table>
+                </div>
                 
-                <h3 style="color: #d4af37; margin-top: 20px; margin-bottom: 10px;">Payout Calculation:</h3>
-                <p style="margin-bottom: 10px;">For each winning payline:</p>
-                <p style="background: rgba(212, 175, 55, 0.1); padding: 10px; border-radius: 5px; margin-bottom: 15px;">
-                    <strong>Payout = (Bet ÷ 10) × Symbol Multiplier</strong>
+                <p style="background: rgba(212, 175, 55, 0.1); padding: 10px; border-radius: 5px; margin-bottom: 12px; font-size: 0.9rem;">
+                    <strong>Payout = (Bet ÷ 10) × Multiplier from table</strong>
                 </p>
-                <p style="margin-bottom: 15px;">If multiple paylines win, all payouts are added together!</p>
+                <p style="margin-bottom: 12px; font-size: 0.9rem;">If multiple paylines win, all payouts are added together!</p>
                 
-                <p style="margin-top: 20px; color: #4ade80;"><strong>💡 Tip:</strong> Click "Show Paylines" to see all 10 payline patterns on the grid!</p>
+                <p style="margin-top: 15px; color: #4ade80; font-size: 0.9rem;"><strong>💡 Tip:</strong> Click "Show Paylines" to see all 10 payline patterns!</p>
             </div>
             <button class="choice-button" id="complexHelpClose" style="width: 100%;">Got it!</button>
         </div>
@@ -2612,19 +2674,27 @@
         // COMPLEX VAULT SLOT - Tab 2
         // ============================================
 
-        // Complex Slot Symbols with Multipliers
+        // Complex Slot Symbols with Multipliers and Frequency Weights
         const complexSymbols = {
-            '🔥': { name: 'Torch', multiplier: 1.1 },
-            '📜': { name: 'Scroll', multiplier: 1.2 },
-            '🧭': { name: 'Compass', multiplier: 1.3 },
-            '🏺': { name: 'Coin', multiplier: 1.4 },
-            '🌍': { name: 'Globe', multiplier: 1.5 },
-            '🗝️': { name: 'Key', multiplier: 1.6 },
-            '⭐': { name: 'Legacy Star', multiplier: 1.8 },
-            '💎': { name: 'Vault Gem', multiplier: 2.0 }
+            '🔥': { name: 'Torch', frequency: 15, payouts: { 3: 1.1, 4: 2.2, 5: 3.3 } },
+            '📜': { name: 'Scroll', frequency: 14, payouts: { 3: 1.2, 4: 2.4, 5: 4.8 } },
+            '🧭': { name: 'Compass', frequency: 13, payouts: { 3: 1.3, 4: 2.6, 5: 5.2 } },
+            '🏺': { name: 'Coin', frequency: 12, payouts: { 3: 1.4, 4: 2.8, 5: 5.6 } },
+            '🌍': { name: 'Globe', frequency: 10, payouts: { 3: 1.5, 4: 3.0, 5: 6.0 } },
+            '🗝️': { name: 'Key', frequency: 8, payouts: { 3: 1.6, 4: 3.2, 5: 6.4 } },
+            '⭐': { name: 'Legacy Star', frequency: 5, payouts: { 3: 1.8, 4: 3.6, 5: 7.2 } },
+            '💎': { name: 'Vault Gem', frequency: 3, payouts: { 3: 2.0, 4: 4.0, 5: 8.0 } }
         };
 
-        const complexSymbolArray = Object.keys(complexSymbols);
+        // Create weighted symbol array for random selection
+        const complexSymbolWeightedArray = [];
+        Object.keys(complexSymbols).forEach(symbol => {
+            for (let i = 0; i < complexSymbols[symbol].frequency; i++) {
+                complexSymbolWeightedArray.push(symbol);
+            }
+        });
+
+        const complexSymbolArray = Object.keys(complexSymbols); // Keep for compatibility
         const GRID_ROWS = 3;
         const GRID_COLS = 5;
 
@@ -2688,7 +2758,7 @@
             svg.style.display = 'none';
             complexGridContainer.appendChild(svg);
 
-            // Create grid cells
+            // Create grid cells with strips for spinning
             for (let row = 0; row < GRID_ROWS; row++) {
                 for (let col = 0; col < GRID_COLS; col++) {
                     const cell = document.createElement('div');
@@ -2696,32 +2766,91 @@
                     cell.id = `cell-${row}-${col}`;
                     cell.dataset.row = row;
                     cell.dataset.col = col;
-                    // Set initial random symbol
-                    const randomSymbol = complexSymbolArray[Math.floor(Math.random() * complexSymbolArray.length)];
-                    cell.textContent = randomSymbol;
+                    
+                    // Create strip with multiple symbols
+                    const strip = document.createElement('div');
+                    strip.className = 'complex-symbol-strip';
+                    strip.id = `strip-${row}-${col}`;
+                    
+                    // Add 20 symbol instances for smooth scrolling
+                    for (let i = 0; i < 20; i++) {
+                        const symbolItem = document.createElement('div');
+                        symbolItem.className = 'complex-symbol-item';
+                        const randomSymbol = complexSymbolWeightedArray[Math.floor(Math.random() * complexSymbolWeightedArray.length)];
+                        symbolItem.textContent = randomSymbol;
+                        strip.appendChild(symbolItem);
+                    }
+                    
+                    cell.appendChild(strip);
+                    
+                    // Set initial random symbol in grid state
+                    const randomSymbol = complexSymbolWeightedArray[Math.floor(Math.random() * complexSymbolWeightedArray.length)];
                     complexGameState.grid[row][col] = randomSymbol;
+                    
+                    // Position strip to show the initial symbol (first symbol visible)
+                    strip.style.transform = 'translateY(0px)';
+                    
                     complexGridContainer.appendChild(cell);
                 }
             }
+            
+            // Update visible symbols after a short delay to ensure grid is rendered
+            setTimeout(() => {
+                for (let row = 0; row < GRID_ROWS; row++) {
+                    for (let col = 0; col < GRID_COLS; col++) {
+                        const cell = document.getElementById(`cell-${row}-${col}`);
+                        const strip = document.getElementById(`strip-${row}-${col}`);
+                        if (cell && strip) {
+                            // Update first symbol item to match grid state
+                            const symbolItems = strip.querySelectorAll('.complex-symbol-item');
+                            if (symbolItems.length > 0) {
+                                symbolItems[0].textContent = complexGameState.grid[row][col];
+                            }
+                        }
+                    }
+                }
+            }, 100);
         }
 
-        // Check payline for win (all 5 symbols identical)
+        // Check payline for win (3, 4, or 5 consecutive matching symbols from left)
         function checkPayline(payline) {
             const symbols = payline.map(([row, col]) => complexGameState.grid[row][col]);
             const firstSymbol = symbols[0];
-            return symbols.every(symbol => symbol === firstSymbol);
+            
+            // Count consecutive matches from left
+            let matchCount = 1;
+            for (let i = 1; i < symbols.length; i++) {
+                if (symbols[i] === firstSymbol) {
+                    matchCount++;
+                } else {
+                    break; // Must be consecutive from left
+                }
+            }
+            
+            // Win if 3, 4, or 5 matches
+            if (matchCount >= 3) {
+                return {
+                    wins: true,
+                    matchCount: matchCount,
+                    symbol: firstSymbol
+                };
+            }
+            return { wins: false, matchCount: 0, symbol: null };
         }
 
         // Check all paylines and return winning ones
         function checkAllPaylines() {
             const winningPaylines = [];
             PAYLINES.forEach((payline, index) => {
-                if (checkPayline(payline)) {
+                const result = checkPayline(payline);
+                if (result.wins) {
+                    const symbolData = complexSymbols[result.symbol];
                     winningPaylines.push({
                         lineNumber: index + 1,
                         positions: payline,
-                        symbol: complexGameState.grid[payline[0][0]][payline[0][1]],
-                        multiplier: complexSymbols[complexGameState.grid[payline[0][0]][payline[0][1]]].multiplier
+                        symbol: result.symbol,
+                        matchCount: result.matchCount,
+                        multiplier: symbolData.payouts[result.matchCount]
                     });
                 }
             });
@@ -2812,30 +2941,70 @@
             betInputComplex.disabled = true;
             complexWinSummary.style.display = 'none';
 
-            // Animate spinning
-            const cells = complexGridContainer.querySelectorAll('.complex-symbol-cell');
-            cells.forEach(cell => {
-                cell.classList.add('spinning');
-            });
-
-            // Generate random symbols for grid
+            // Animate spinning for each cell
+            const spinPromises = [];
             for (let row = 0; row < GRID_ROWS; row++) {
                 for (let col = 0; col < GRID_COLS; col++) {
-                    const randomSymbol = complexSymbolArray[Math.floor(Math.random() * complexSymbolArray.length)];
-                    complexGameState.grid[row][col] = randomSymbol;
+                    const cell = document.getElementById(`cell-${row}-${col}`);
+                    const strip = document.getElementById(`strip-${row}-${col}`);
+                    cell.classList.add('spinning');
+                    
+                    // Generate target symbol using weighted selection
+                    const targetSymbol = complexSymbolWeightedArray[Math.floor(Math.random() * complexSymbolWeightedArray.length)];
+                    complexGameState.grid[row][col] = targetSymbol;
+                    
+                    // Find target symbol in strip
+                    const symbolItems = strip.querySelectorAll('.complex-symbol-item');
+                    let targetIndex = -1;
+                    for (let i = 0; i < symbolItems.length; i++) {
+                        if (symbolItems[i].textContent === targetSymbol && i > 5) {
+                            targetIndex = i;
+                            break;
+                        }
+                    }
+                    if (targetIndex === -1) {
+                        targetIndex = Math.floor(Math.random() * (symbolItems.length - 5)) + 5;
+                    }
+                    
+                    // Calculate spin distance
+                    const cellHeight = cell.offsetHeight;
+                    const finalY = -(targetIndex * cellHeight);
+                    const extraSpins = 3 + Math.random() * 2;
+                    const totalDistance = -(extraSpins * symbolItems.length * cellHeight) + finalY;
+                    
+                    // Animate with deceleration
+                    const duration = 1500 + (row * 100) + (col * 50);
+                    const delay = (row * 50) + (col * 30);
+                    
+                    spinPromises.push(new Promise(resolve => {
+                        setTimeout(() => {
+                            const startTime = Date.now();
+                            let startY = 0;
+                            const distance = totalDistance;
+                            
+                            function animate() {
+                                const elapsed = Date.now() - startTime;
+                                const progress = Math.min(elapsed / duration, 1);
+                                const easeOutCubic = 1 - Math.pow(1 - progress, 3);
+                                const currentY = startY + (distance * easeOutCubic);
+                                strip.style.transform = `translateY(${currentY}px)`;
+                                
+                                if (progress < 1) {
+                                    requestAnimationFrame(animate);
+                                } else {
+                                    strip.style.transform = `translateY(${finalY}px)`;
+                                    cell.classList.remove('spinning');
+                                    resolve();
+                                }
+                            }
+                            requestAnimationFrame(animate);
+                        }, delay);
+                    }));
                 }
             }
 
-            // Wait for animation
-            await new Promise(resolve => setTimeout(resolve, 2000));
-
-            // Stop spinning and update display
-            cells.forEach((cell, index) => {
-                const row = Math.floor(index / GRID_COLS);
-                const col = index % GRID_COLS;
-                cell.textContent = complexGameState.grid[row][col];
-                cell.classList.remove('spinning');
-            });
+            // Wait for all animations
+            await Promise.all(spinPromises);
 
             // Check for wins
             const winningPaylines = checkAllPaylines();
@@ -2864,12 +3033,21 @@
                 // Update win summary
                 complexWinSummary.classList.add('win');
                 complexWinSummary.style.display = 'block';
+                
+                // Create win details
+                const winDetails = winningPaylines.map(win => 
+                    `Line ${win.lineNumber}: ${win.matchCount}× ${win.symbol} (×${win.multiplier})`
+                ).join('<br>');
+                
                 complexWinMessage.innerHTML = `
                     <div style="font-size: 1.3rem; color: #4ade80; font-weight: 700; margin-bottom: 10px;">
                         🎉 You won on ${winningPaylines.length} payline${winningPaylines.length > 1 ? 's' : ''}!
                     </div>
                     <div style="font-size: 1.1rem; color: #ffd700; margin-bottom: 8px;">
                         Total Payout: $${totalPayout.toFixed(2)}
+                    </div>
+                    <div style="font-size: 0.85rem; color: #aaa; margin-bottom: 8px; text-align: left; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 5px;">
+                        ${winDetails}
                     </div>
                     <div style="font-size: 0.9rem; color: #aaa;">
                         Donation: $${donationAmount.toFixed(2)} (${DONATION_PERCENTAGE}% of $${complexGameState.betAmount.toLocaleString()}) to cause
