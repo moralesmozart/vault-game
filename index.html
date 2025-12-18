@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legends of the Vault – Vault of Causes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated background particles */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(212, 175, 55, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            padding: 30px 20px;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #d4af37 0%, #ffd700 50%, #d4af37 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            color: #d4af37;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+
+        .disclaimer {
+            font-size: 0.85rem;
+            color: #888;
+            font-style: italic;
+        }
+
+        /* Main Game Area */
+        .game-section {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        @media (min-width: 768px) {
+            .game-section {
+                grid-template-columns: 2fr 1fr;
+            }
+        }
+
+        /* Cause Selection */
+        .cause-panel {
+            background: rgba(26, 26, 46, 0.8);
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+        }
+
+        .cause-panel h2 {
+            color: #d4af37;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .causes {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .cause-option {
+            background: rgba(15, 52, 96, 0.6);
+            border: 2px solid rgba(212, 175, 55, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .cause-option:hover {
+            border-color: rgba(212, 175, 55, 0.6);
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.2);
+        }
+
+        .cause-option.selected {
+            border-color: #d4af37;
+            background: rgba(212, 175, 55, 0.15);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+        }
+
+        .cause-emoji {
+            font-size: 2rem;
+        }
+
+        .cause-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        /* Slot Machine */
+        .slot-machine {
+            background: rgba(26, 26, 46, 0.8);
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            border-radius: 15px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            text-align: center;
+        }
+
+        .reels-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 30px 0;
+            perspective: 1000px;
+            flex-wrap: wrap;
+        }
+
+        .reel {
+            width: 90px;
+            height: 110px;
+            background: rgba(15, 52, 96, 0.8);
+            border: 3px solid #d4af37;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .reel.spinning {
+            animation: spin 0.5s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-100%); }
+        }
+
+        .reel-symbol {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .spin-button {
+            background: linear-gradient(135deg, #d4af37 0%, #ffd700 100%);
+            border: none;
+            color: #1a1a2e;
+            font-size: 1.5rem;
+            font-weight: 700;
+            padding: 20px 60px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 5px 20px rgba(212, 175, 55, 0.4);
+            margin-top: 20px;
+        }
+
+        .spin-button:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 8px 30px rgba(212, 175, 55, 0.6);
+        }
+
+        .spin-button:active:not(:disabled) {
+            transform: scale(0.98);
+        }
+
+        .spin-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .result-message {
+            margin-top: 25px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            min-height: 40px;
+            transition: all 0.3s ease;
+        }
+
+        .result-message.win {
+            color: #4ade80;
+            animation: pulse 0.5s ease;
+        }
+
+        .result-message.loss {
+            color: #fbbf24;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Impact Progression */
+        .progress-panel {
+            background: rgba(26, 26, 46, 0.8);
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 30px;
+        }
+
+        .progress-panel h2 {
+            color: #d4af37;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        .progress-bar-container {
+            background: rgba(15, 52, 96, 0.6);
+            border-radius: 10px;
+            height: 30px;
+            overflow: hidden;
+            position: relative;
+            border: 2px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, #d4af37 0%, #ffd700 100%);
+            height: 100%;
+            width: 0%;
+            transition: width 0.8s ease;
+            position: relative;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .progress-percentage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: 700;
+            color: #1a1a2e;
+            z-index: 1;
+        }
+
+        /* Stats Panel */
+        .stats-panel {
+            background: rgba(26, 26, 46, 0.8);
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+        }
+
+        .stats-panel h2 {
+            color: #d4af37;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .stat-item {
+            background: rgba(15, 52, 96, 0.6);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #d4af37;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+
+        #spinResultOverlay {
+            z-index: 999;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 3px solid #d4af37;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 50px rgba(212, 175, 55, 0.5);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal h2 {
+            font-size: 2.5rem;
+            color: #d4af37;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+        }
+
+        .modal-text {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            color: #e0e0e0;
+        }
+
+        .modal-choices {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .choice-button {
+            background: rgba(212, 175, 55, 0.2);
+            border: 2px solid #d4af37;
+            color: #d4af37;
+            padding: 15px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .choice-button:hover {
+            background: rgba(212, 175, 55, 0.3);
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(212, 175, 55, 0.3);
+        }
+
+        /* Spin Result Modal */
+        .spin-result-modal {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 3px solid #d4af37;
+            border-radius: 20px;
+            padding: 35px;
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 50px rgba(212, 175, 55, 0.5);
+            animation: slideUp 0.3s ease;
+            position: relative;
+        }
+
+        .spin-result-modal.win {
+            border-color: #4ade80;
+            box-shadow: 0 10px 50px rgba(74, 222, 128, 0.4);
+        }
+
+        .spin-result-modal.loss {
+            border-color: #fbbf24;
+            box-shadow: 0 10px 50px rgba(251, 191, 36, 0.4);
+        }
+
+        .spin-result-modal h3 {
+            font-size: 1.8rem;
+            color: #d4af37;
+            margin-bottom: 20px;
+        }
+
+        .spin-result-modal.win h3 {
+            color: #4ade80;
+        }
+
+        .spin-result-modal.loss h3 {
+            color: #fbbf24;
+        }
+
+        .spin-result-text {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            color: #e0e0e0;
+        }
+
+        .spin-result-close {
+            background: linear-gradient(135deg, #d4af37 0%, #ffd700 100%);
+            border: none;
+            color: #1a1a2e;
+            padding: 12px 40px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .spin-result-close:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(212, 175, 55, 0.4);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 767px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .subtitle {
+                font-size: 1.1rem;
+            }
+
+            .reels-container {
+                gap: 8px;
+            }
+
+            .reel {
+                width: 60px;
+                height: 75px;
+                font-size: 2.5rem;
+            }
+
+            .spin-button {
+                padding: 15px 40px;
+                font-size: 1.2rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Legends of the Vault</h1>
+            <p class="subtitle">Explore the Vault. Build a Legacy.</p>
+            <p class="disclaimer">Demo MVP – No real money involved</p>
+        </header>
+
+        <div class="game-section">
+            <div class="slot-machine">
+                <h2 style="color: #d4af37; margin-bottom: 20px;">The Vault</h2>
+                <div class="reels-container" id="reelsContainer">
+                    <div class="reel" id="reel1">
+                        <div class="reel-symbol">🎰</div>
+                    </div>
+                    <div class="reel" id="reel2">
+                        <div class="reel-symbol">💎</div>
+                    </div>
+                    <div class="reel" id="reel3">
+                        <div class="reel-symbol">🏆</div>
+                    </div>
+                    <div class="reel" id="reel4">
+                        <div class="reel-symbol">⭐</div>
+                    </div>
+                    <div class="reel" id="reel5">
+                        <div class="reel-symbol">🔮</div>
+                    </div>
+                </div>
+                <button class="spin-button" id="spinButton" disabled>SPIN</button>
+                <div class="result-message" id="resultMessage"></div>
+            </div>
+
+            <div class="cause-panel">
+                <h2>Choose Your Cause</h2>
+                <div class="causes" id="causesContainer">
+                    <div class="cause-option" data-cause="reforest">
+                        <span class="cause-emoji">🌱</span>
+                        <span class="cause-name">Reforest City A</span>
+                    </div>
+                    <div class="cause-option" data-cause="food">
+                        <span class="cause-emoji">🍽️</span>
+                        <span class="cause-name">Food Support Initiative B</span>
+                    </div>
+                    <div class="cause-option" data-cause="ocean">
+                        <span class="cause-emoji">🌊</span>
+                        <span class="cause-name">Ocean Cleanup Program C</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="progress-panel">
+            <h2>Vault Progress</h2>
+            <div class="progress-label">
+                <span id="selectedCauseName">Select a cause to begin</span>
+                <span id="progressText">0 / 100</span>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progressBar">
+                    <div class="progress-percentage" id="progressPercentage">0%</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-panel">
+            <h2>Session Stats</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value" id="spinsPlayed">0</div>
+                    <div class="stat-label">Spins Played</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="wins">0</div>
+                    <div class="stat-label">Wins</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="vaultsUnlocked">0</div>
+                    <div class="stat-label">Vaults Unlocked</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="totalImpact">0</div>
+                    <div class="stat-label">Total Impact Points</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Spin Result Modal -->
+    <div class="modal-overlay" id="spinResultOverlay">
+        <div class="spin-result-modal" id="spinResultModal">
+            <h3 id="spinResultTitle"></h3>
+            <p class="spin-result-text" id="spinResultText"></p>
+            <button class="spin-result-close" id="spinResultClose">Continue</button>
+        </div>
+    </div>
+
+    <!-- Vault Milestone Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <h2>Vault Unlocked! 🎉</h2>
+            <p class="modal-text" id="modalText">
+                Your dedication has opened a new chamber in the Vault. The legacy you're building continues to grow, creating lasting impact for your chosen cause.
+            </p>
+            <div class="modal-choices">
+                <button class="choice-button" data-amplify="5">Amplify this cause (+5%)</button>
+                <button class="choice-button" data-amplify="10">Amplify this cause (+10%)</button>
+                <button class="choice-button" data-amplify="0">Skip</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game State
+        const gameState = {
+            selectedCause: null,
+            impactPoints: 0,
+            spinsPlayed: 0,
+            wins: 0,
+            vaultsUnlocked: 0,
+            totalImpact: 0
+        };
+
+        // Cause definitions
+        const causes = {
+            reforest: { name: 'Reforest City A', emoji: '🌱' },
+            food: { name: 'Food Support Initiative B', emoji: '🍽️' },
+            ocean: { name: 'Ocean Cleanup Program C', emoji: '🌊' }
+        };
+
+        // Symbols for reels
+        const symbols = ['🎰', '💎', '🏆', '⭐', '🔮', '👑'];
+
+        // DOM Elements
+        const causesContainer = document.getElementById('causesContainer');
+        const spinButton = document.getElementById('spinButton');
+        const reelsContainer = document.getElementById('reelsContainer');
+        const resultMessage = document.getElementById('resultMessage');
+        const progressBar = document.getElementById('progressBar');
+        const progressPercentage = document.getElementById('progressPercentage');
+        const progressText = document.getElementById('progressText');
+        const selectedCauseName = document.getElementById('selectedCauseName');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modalText = document.getElementById('modalText');
+        const spinResultOverlay = document.getElementById('spinResultOverlay');
+        const spinResultModal = document.getElementById('spinResultModal');
+        const spinResultTitle = document.getElementById('spinResultTitle');
+        const spinResultText = document.getElementById('spinResultText');
+        const spinResultClose = document.getElementById('spinResultClose');
+        const statsElements = {
+            spinsPlayed: document.getElementById('spinsPlayed'),
+            wins: document.getElementById('wins'),
+            vaultsUnlocked: document.getElementById('vaultsUnlocked'),
+            totalImpact: document.getElementById('totalImpact')
+        };
+
+        // Clear state on page load (fresh start every time)
+        function clearState() {
+            localStorage.removeItem('vaultGameState');
+            // Reset game state to initial values
+            gameState.selectedCause = null;
+            gameState.impactPoints = 0;
+            gameState.spinsPlayed = 0;
+            gameState.wins = 0;
+            gameState.vaultsUnlocked = 0;
+            gameState.totalImpact = 0;
+            updateUI();
+        }
+
+        // Save state to localStorage
+        function saveState() {
+            localStorage.setItem('vaultGameState', JSON.stringify(gameState));
+        }
+
+        // Initialize cause selection
+        causesContainer.addEventListener('click', (e) => {
+            const causeOption = e.target.closest('.cause-option');
+            if (!causeOption) return;
+
+            const causeId = causeOption.dataset.cause;
+            gameState.selectedCause = causeId;
+
+            // Update UI
+            document.querySelectorAll('.cause-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            causeOption.classList.add('selected');
+
+            selectedCauseName.textContent = `${causes[causeId].emoji} ${causes[causeId].name}`;
+            spinButton.disabled = false;
+
+            saveState();
+        });
+
+        // Show spin result popup
+        function showSpinResult(isWin) {
+            const cause = causes[gameState.selectedCause];
+            
+            if (isWin) {
+                spinResultTitle.textContent = 'You Won! 🎉';
+                spinResultText.textContent = `You won and we are adding 5% to the cause ${cause.name}.`;
+                spinResultModal.classList.remove('loss');
+                spinResultModal.classList.add('win');
+            } else {
+                spinResultTitle.textContent = 'Keep Trying';
+                spinResultText.textContent = `Your spin for a cause did not win, but we are donating 5% of the value to ${cause.name}.`;
+                spinResultModal.classList.remove('win');
+                spinResultModal.classList.add('loss');
+            }
+            
+            spinResultOverlay.classList.add('active');
+        }
+
+        // Close spin result popup
+        function closeSpinResult() {
+            spinResultOverlay.classList.remove('active');
+            
+            // Check for vault unlock after closing popup
+            if (gameState.impactPoints >= 100) {
+                setTimeout(() => {
+                    unlockVault();
+                }, 500);
+            } else {
+                spinButton.disabled = false;
+            }
+        }
+
+        // Spin function
+        function spin() {
+            if (!gameState.selectedCause) return;
+
+            spinButton.disabled = true;
+            resultMessage.textContent = '';
+            resultMessage.className = 'result-message';
+
+            // Animate reels
+            const reels = document.querySelectorAll('.reel');
+            reels.forEach(reel => {
+                reel.classList.add('spinning');
+            });
+
+            // Random symbols for each reel
+            const reelSymbols = [];
+            reels.forEach(reel => {
+                const randomSymbol = symbols[Math.floor(Math.random() * symbols.length)];
+                reel.querySelector('.reel-symbol').textContent = randomSymbol;
+                reelSymbols.push(randomSymbol);
+            });
+
+            // Check for win: at least 3 matching symbols
+            function checkWin(symbols) {
+                const symbolCounts = {};
+                symbols.forEach(symbol => {
+                    symbolCounts[symbol] = (symbolCounts[symbol] || 0) + 1;
+                });
+                
+                // Check if any symbol appears 3 or more times
+                return Object.values(symbolCounts).some(count => count >= 3);
+            }
+
+            const isWin = checkWin(reelSymbols);
+
+            setTimeout(() => {
+                reels.forEach(reel => {
+                    reel.classList.remove('spinning');
+                });
+
+                gameState.spinsPlayed++;
+                let impactGained = 0;
+
+                if (isWin) {
+                    impactGained = 20;
+                    gameState.wins++;
+                    resultMessage.textContent = '🎉 Victory! Legacy strengthened!';
+                    resultMessage.classList.add('win');
+                } else {
+                    impactGained = 5;
+                    resultMessage.textContent = 'Legacy grows even in failure';
+                    resultMessage.classList.add('loss');
+                }
+
+                gameState.impactPoints += impactGained;
+                gameState.totalImpact += impactGained;
+
+                updateProgress();
+                updateStats();
+                saveState();
+
+                // Show spin result popup
+                setTimeout(() => {
+                    showSpinResult(isWin);
+                }, 500);
+            }, 1500);
+        }
+
+        // Event listeners for spin result modal
+        spinResultClose.addEventListener('click', closeSpinResult);
+        spinResultOverlay.addEventListener('click', (e) => {
+            if (e.target === spinResultOverlay) {
+                closeSpinResult();
+            }
+        });
+
+        // Update progress bar
+        function updateProgress() {
+            const percentage = Math.min(gameState.impactPoints, 100);
+            progressBar.style.width = `${percentage}%`;
+            progressPercentage.textContent = `${percentage}%`;
+            progressText.textContent = `${gameState.impactPoints} / 100`;
+        }
+
+        // Update stats
+        function updateStats() {
+            statsElements.spinsPlayed.textContent = gameState.spinsPlayed;
+            statsElements.wins.textContent = gameState.wins;
+            statsElements.vaultsUnlocked.textContent = gameState.vaultsUnlocked;
+            statsElements.totalImpact.textContent = gameState.totalImpact;
+        }
+
+        // Unlock vault
+        function unlockVault() {
+            gameState.vaultsUnlocked++;
+            const cause = causes[gameState.selectedCause];
+            modalText.textContent = `Your dedication has opened a new chamber in the Vault. The legacy you're building continues to grow, creating lasting impact for ${cause.name}.`;
+            modalOverlay.classList.add('active');
+            updateStats();
+        }
+
+        // Handle modal choices
+        modalOverlay.addEventListener('click', (e) => {
+            const choiceButton = e.target.closest('.choice-button');
+            if (!choiceButton) return;
+
+            const amplify = parseInt(choiceButton.dataset.amplify);
+            
+            // Visual feedback only (no actual logic needed for MVP)
+            if (amplify > 0) {
+                console.log(`Amplified cause by ${amplify}%`);
+            }
+
+            // Reset progress and close modal
+            gameState.impactPoints = 0;
+            updateProgress();
+            modalOverlay.classList.remove('active');
+            spinButton.disabled = false;
+            saveState();
+        });
+
+        // Spin button event
+        spinButton.addEventListener('click', spin);
+
+        // Initialize UI
+        function updateUI() {
+            // Clear cause selection UI
+            document.querySelectorAll('.cause-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            selectedCauseName.textContent = 'Select a cause to begin';
+            spinButton.disabled = true;
+
+            updateProgress();
+            updateStats();
+        }
+
+        // Clear state on page load (fresh start every time)
+        clearState();
+    </script>
+</body>
+</html>
