@@ -1676,23 +1676,6 @@
         <div class="game-section">
             <div class="slot-machine">
                 <h2 style="color: #d4af37; margin-bottom: 20px;">The Vault</h2>
-                
-                <!-- Wallet Section -->
-                <div class="wallet-section" style="background: rgba(15, 52, 96, 0.4); border: 2px solid rgba(212, 175, 55, 0.3); border-radius: 10px; padding: 15px; margin-bottom: 20px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <span style="font-size: 1.5rem;">💰</span>
-                            <div>
-                                <div style="color: #aaa; font-size: 0.85rem; margin-bottom: 5px;">Wallet Balance</div>
-                                <div id="walletBalanceBasic" style="color: #4ade80; font-size: 1.5rem; font-weight: 700;">$0.00</div>
-                            </div>
-                        </div>
-                        <button class="add-balance-button" id="addBalanceButtonBasic" style="background: rgba(212, 175, 55, 0.2); border: 2px solid #d4af37; color: #d4af37; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600; transition: all 0.3s ease;">
-                            + Add Balance
-                        </button>
-                    </div>
-                </div>
-                
                 <div class="reels-container" id="reelsContainer">
                     <div class="reel" id="reel1">
                         <div class="reel-strip" id="reelStrip1"></div>
@@ -2202,7 +2185,6 @@
         const gameState = {
             selectedCause: null,
             betAmount: 0,
-            walletBalance: 0, // Starting balance
             impactPoints: 0,
             spinsPlayed: 0,
             wins: 0,
@@ -2418,32 +2400,10 @@
             saveState();
         }
 
-        // Load wallet balance from localStorage
-        function loadWalletBalance() {
-            const saved = localStorage.getItem('basicWalletBalance');
-            if (saved !== null) {
-                gameState.walletBalance = parseFloat(saved) || 0;
-            }
-            updateWalletDisplayBasic();
-        }
-        
-        // Save wallet balance to localStorage
-        function saveWalletBalanceBasic() {
-            localStorage.setItem('basicWalletBalance', gameState.walletBalance.toString());
-        }
-        
-        // Update wallet display for basic vault
-        function updateWalletDisplayBasic() {
-            const walletDisplay = document.getElementById('walletBalanceBasic');
-            if (walletDisplay) {
-                walletDisplay.textContent = `$${gameState.walletBalance.toFixed(2)}`;
-            }
-        }
-        
         // Clear state on page load (fresh start every time)
         function clearState() {
             localStorage.removeItem('vaultGameState');
-            // Reset game state to initial values (but keep wallet balance)
+            // Reset game state to initial values
             gameState.selectedCause = null;
             gameState.betAmount = 0;
             gameState.impactPoints = 0;
@@ -2930,18 +2890,6 @@
             betInput.value = 10000;
             handleBetInput(10000);
         });
-        
-        // Add Balance button for basic vault
-        const addBalanceButtonBasic = document.getElementById('addBalanceButtonBasic');
-        if (addBalanceButtonBasic) {
-            addBalanceButtonBasic.addEventListener('click', () => {
-                const addAmount = 100; // Add $100 each time
-                gameState.walletBalance += addAmount;
-                updateWalletDisplayBasic();
-                saveWalletBalanceBasic();
-                updateSpinButtonState();
-            });
-        }
 
         // Spin button event
         spinButton.addEventListener('click', spin);
@@ -2965,9 +2913,6 @@
 
         // Clear state on page load (fresh start every time)
         clearState();
-        
-        // Load wallet balance for basic vault
-        loadWalletBalance();
 
         // ============================================
         // COMPLEX VAULT SLOT - Tab 2
