@@ -3158,10 +3158,8 @@
                 return;
             }
             
-            // Deduct bet from wallet
-            complexGameState.walletBalance -= complexGameState.betAmount;
-            updateWalletDisplay();
-            saveWalletBalance();
+            // Store bet amount for later (we'll handle deduction after calculating payout)
+            const betAmount = complexGameState.betAmount;
 
             spinButtonComplex.disabled = true;
             betInputComplex.disabled = true;
@@ -3231,11 +3229,13 @@
             setTimeout(() => drawPaylines(winningPaylines), 100);
 
             if (isWin) {
-                const totalPayout = calculatePayout(winningPaylines, complexGameState.betAmount);
-                const donationAmount = (complexGameState.betAmount * DONATION_PERCENTAGE) / 100;
+                const totalPayout = calculatePayout(winningPaylines, betAmount);
+                const donationAmount = (betAmount * DONATION_PERCENTAGE) / 100;
                 
-                // Add winnings to wallet
-                complexGameState.walletBalance += totalPayout;
+                // Calculate net result: payout - bet (bet was already deducted, so we add payout)
+                // Since we haven't deducted yet, we do: balance - bet + payout = balance + (payout - bet)
+                const netResult = totalPayout - betAmount;
+                complexGameState.walletBalance += netResult; // This is the net change
                 updateWalletDisplay();
                 saveWalletBalance();
                 
@@ -3263,7 +3263,12 @@
                     showComplexSpinResult(true, winningPaylines, totalPayout, donationAmount);
                 }, 500);
             } else {
-                const donationAmount = (complexGameState.betAmount * DONATION_PERCENTAGE) / 100;
+                // No win - deduct the bet amount
+                complexGameState.walletBalance -= betAmount;
+                updateWalletDisplay();
+                saveWalletBalance();
+                
+                const donationAmount = (betAmount * DONATION_PERCENTAGE) / 100;
                 const baseImpact = complexGameState.betAmount / 100;
                 const impactGained = Math.floor(baseImpact * 5);
                 complexGameState.impactPoints += impactGained;
