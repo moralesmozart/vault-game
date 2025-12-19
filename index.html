@@ -2880,15 +2880,17 @@
         // ============================================
 
         // Complex Slot Symbols with Multipliers and Frequency Weights
+        // Complex slot symbols - includes cause emojis
         const complexSymbols = {
-            '🔥': { name: 'Torch', frequency: 15, payouts: { 3: 1.1, 4: 2.2, 5: 3.3 } },
-            '📜': { name: 'Scroll', frequency: 14, payouts: { 3: 1.2, 4: 2.4, 5: 4.8 } },
-            '🧭': { name: 'Compass', frequency: 13, payouts: { 3: 1.3, 4: 2.6, 5: 5.2 } },
-            '🏺': { name: 'Coin', frequency: 12, payouts: { 3: 1.4, 4: 2.8, 5: 5.6 } },
-            '🌍': { name: 'Globe', frequency: 10, payouts: { 3: 1.5, 4: 3.0, 5: 6.0 } },
-            '🗝️': { name: 'Key', frequency: 8, payouts: { 3: 1.6, 4: 3.2, 5: 6.4 } },
-            '⭐': { name: 'Legacy Star', frequency: 5, payouts: { 3: 1.8, 4: 3.6, 5: 7.2 } },
-            '💎': { name: 'Vault Gem', frequency: 3, payouts: { 3: 2.0, 4: 4.0, 5: 8.0 } }
+            '🌱': { name: 'Reforest', frequency: 15, isCause: true },
+            '🍽️': { name: 'Food Support', frequency: 14, isCause: true },
+            '🌊': { name: 'Ocean Cleanup', frequency: 13, isCause: true },
+            '🧭': { name: 'Compass', frequency: 12, isCause: false },
+            '🏺': { name: 'Coin', frequency: 11, isCause: false },
+            '🌍': { name: 'Globe', frequency: 10, isCause: false },
+            '🗝️': { name: 'Key', frequency: 8, isCause: false },
+            '⭐': { name: 'Legacy Star', frequency: 5, isCause: false },
+            '💎': { name: 'Vault Gem', frequency: 3, isCause: false }
         };
 
         // Create weighted symbol array for random selection
@@ -3033,9 +3035,12 @@
         // Fixed multiplier table (same for all symbols)
         const MULTIPLIER_TABLE = {
             3: 1.2,  // 3 same symbols = ×1.2
-            4: 1.6,  // 4 same symbols = ×1.6
-            5: 2.0   // 5 same symbols = ×2.0
+            4: 2.5,  // 4 same symbols = ×2.5
+            5: 3.5   // 5 same symbols = ×3.5
         };
+        
+        // Special max combo multiplier (cause-aligned or rare pattern)
+        const SPECIAL_MAX_COMBO_MULTIPLIER = 6.0;
         
         // Check payline for win (3+ identical symbols anywhere on the line, order doesn't matter)
         function checkPayline(payline) {
@@ -3058,15 +3063,25 @@
                 }
             }
             
+            // Check for special max combo: all 5 symbols match the selected cause emoji
+            let isSpecialMaxCombo = false;
+            if (complexGameState.selectedCause && maxCount === 5) {
+                const causeEmoji = causes[complexGameState.selectedCause].emoji;
+                if (winningSymbol === causeEmoji) {
+                    isSpecialMaxCombo = true;
+                }
+            }
+            
             // Win if highest count is 3 or more
             if (maxCount >= 3) {
                 return {
                     wins: true,
                     matchCount: maxCount,
-                    symbol: winningSymbol
+                    symbol: winningSymbol,
+                    isSpecialMaxCombo: isSpecialMaxCombo
                 };
             }
-            return { wins: false, matchCount: 0, symbol: null };
+            return { wins: false, matchCount: 0, symbol: null, isSpecialMaxCombo: false };
         }
 
         // Check all paylines and return winning ones
@@ -3075,14 +3090,20 @@
             PAYLINES.forEach((payline, index) => {
                 const result = checkPayline(payline);
                 if (result.wins) {
-                    // Use fixed multiplier table (same for all symbols)
-                    const multiplier = MULTIPLIER_TABLE[result.matchCount];
+                    // Use special max combo multiplier if applicable, otherwise use standard multiplier
+                    let multiplier;
+                    if (result.isSpecialMaxCombo) {
+                        multiplier = SPECIAL_MAX_COMBO_MULTIPLIER;
+                    } else {
+                        multiplier = MULTIPLIER_TABLE[result.matchCount];
+                    }
                     winningPaylines.push({
                         lineNumber: index + 1,
                         positions: payline,
                         symbol: result.symbol,
                         matchCount: result.matchCount,
-                        multiplier: multiplier
+                        multiplier: multiplier,
+                        isSpecialMaxCombo: result.isSpecialMaxCombo
                     });
                 }
             });
@@ -3095,9 +3116,8 @@
             let totalPayout = 0;
             
             winningPaylines.forEach(win => {
-                // Payout includes bet back + winnings
-                // Line payout = bet back + (bet * multiplier)
-                const linePayout = betPerLine + (betPerLine * win.multiplier);
+                // Payout = bet_per_line × multiplier (no bet back included)
+                const linePayout = betPerLine * win.multiplier;
                 totalPayout += linePayout;
             });
             
@@ -3234,8 +3254,8 @@
                 const totalPayout = calculatePayout(winningPaylines, betAmount);
                 const donationAmount = (betAmount * DONATION_PERCENTAGE) / 100;
                 
-                // Payout already includes bet back, so we just add the payout
-                // Then deduct the bet to get net result
+                // Add payout to wallet (payout is already net: bet_per_line × multiplier)
+                // Then deduct the bet to get final net result
                 complexGameState.walletBalance += totalPayout;
                 complexGameState.walletBalance -= betAmount; // Deduct the bet
                 updateWalletDisplay();
