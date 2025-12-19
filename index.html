@@ -3077,16 +3077,26 @@
                 }
             }
             
+            // Check for save spin: 3, 4, or 5 matching symbols are the cause emoji
+            let isSaveSpin = false;
+            if (complexGameState.selectedCause && maxCount >= 3) {
+                const causeEmoji = causes[complexGameState.selectedCause].emoji;
+                if (winningSymbol === causeEmoji) {
+                    isSaveSpin = true;
+                }
+            }
+            
             // Win if highest count is 3 or more
             if (maxCount >= 3) {
                 return {
                     wins: true,
                     matchCount: maxCount,
                     symbol: winningSymbol,
-                    isSpecialMaxCombo: isSpecialMaxCombo
+                    isSpecialMaxCombo: isSpecialMaxCombo,
+                    isSaveSpin: isSaveSpin
                 };
             }
-            return { wins: false, matchCount: 0, symbol: null, isSpecialMaxCombo: false };
+            return { wins: false, matchCount: 0, symbol: null, isSpecialMaxCombo: false, isSaveSpin: false };
         }
 
         // Check all paylines and return winning ones
@@ -3108,7 +3118,8 @@
                         symbol: result.symbol,
                         matchCount: result.matchCount,
                         multiplier: multiplier,
-                        isSpecialMaxCombo: result.isSpecialMaxCombo
+                        isSpecialMaxCombo: result.isSpecialMaxCombo,
+                        isSaveSpin: result.isSaveSpin
                     });
                 }
             });
@@ -3256,11 +3267,21 @@
             setTimeout(() => drawPaylines(winningPaylines), 100);
 
             if (isWin) {
-                const totalPayout = calculatePayout(winningPaylines, betAmount);
+                // Check if any winning payline is a "save spin" (cause-aligned)
+                const hasSaveSpin = winningPaylines.some(win => win.isSaveSpin);
+                
+                let totalPayout;
+                if (hasSaveSpin) {
+                    // Save spin: recover full bet (break even)
+                    totalPayout = betAmount;
+                } else {
+                    // Normal payout calculation
+                    totalPayout = calculatePayout(winningPaylines, betAmount);
+                }
+                
                 const donationAmount = (betAmount * DONATION_PERCENTAGE) / 100;
                 
-                // Add payout to wallet (payout is already net: bet_per_line × multiplier)
-                // Then deduct the bet to get final net result
+                // Add payout to wallet, then deduct the bet to get final net result
                 complexGameState.walletBalance += totalPayout;
                 complexGameState.walletBalance -= betAmount; // Deduct the bet
                 updateWalletDisplay();
@@ -3287,7 +3308,8 @@
                 
                 // Show spin result popup
                 setTimeout(() => {
-                    showComplexSpinResult(true, winningPaylines, totalPayout, donationAmount);
+                    const hasSaveSpin = winningPaylines.some(win => win.isSaveSpin);
+                    showComplexSpinResult(true, winningPaylines, totalPayout, donationAmount, hasSaveSpin);
                 }, 500);
             } else {
                 // No win - deduct the bet amount
@@ -3351,7 +3373,7 @@
         }
 
         // Show complex spin result popup (like basic vault)
-        function showComplexSpinResult(isWin, winningPaylines, totalPayout, donationAmount) {
+        function showComplexSpinResult(isWin, winningPaylines, totalPayout, donationAmount, hasSaveSpin = false) {
             const cause = causes[complexGameState.selectedCause];
             const spinResultTitle = document.getElementById('spinResultTitle');
             const spinResultText = document.getElementById('spinResultText');
@@ -3359,17 +3381,36 @@
             const spinResultOverlay = document.getElementById('spinResultOverlay');
             
             if (isWin) {
-                const winDetails = winningPaylines.map(win => 
-                    `Line ${win.lineNumber}: ${win.matchCount}× ${win.symbol} (×${win.multiplier})`
-                ).join(' | ');
+                const winDetails = winningPaylines.map(win => {
+                    let detail = `Line ${win.lineNumber}: ${win.matchCount}× ${win.symbol}`;
+                    if (win.isSaveSpin) {
+                        detail += ' 🛡️ (Save Spin)';
+                    } else if (win.isSpecialMaxCombo) {
+                        detail += ` (×${win.multiplier} Special Max Combo)`;
+                    } else {
+                        detail += ` (×${win.multiplier})`;
+                    }
+                    return detail;
+                }).join(' | ');
                 
-                spinResultTitle.textContent = 'You Won! 🎉';
-                spinResultText.innerHTML = `
-                    You won on ${winningPaylines.length} payline${winningPaylines.length > 1 ? 's' : ''}!<br>
-                    <strong style="color: #ffd700;">Total Payout: $${totalPayout.toFixed(2)}</strong><br><br>
-                    ${winDetails}<br><br>
-                    We're donating $${donationAmount.toFixed(2)} (${DONATION_PERCENTAGE}% of your $${complexGameState.betAmount.toLocaleString()} bet) to ${cause.name}.
-                `;
+                if (hasSaveSpin) {
+                    spinResultTitle.textContent = '🛡️ Save Spin!';
+                    spinResultText.innerHTML = `
+                        <strong style="color: #4ade80;">You recovered your entire bet!</strong><br>
+                        One or more winning paylines matched your selected cause ${cause.emoji}, triggering a Save Spin.<br><br>
+                        <strong style="color: #ffd700;">Total Recovery: $${totalPayout.toFixed(2)}</strong><br><br>
+                        ${winDetails}<br><br>
+                        We're donating $${donationAmount.toFixed(2)} (${DONATION_PERCENTAGE}% of your $${complexGameState.betAmount.toLocaleString()} bet) to ${cause.name}.
+                    `;
+                } else {
+                    spinResultTitle.textContent = 'You Won! 🎉';
+                    spinResultText.innerHTML = `
+                        You won on ${winningPaylines.length} payline${winningPaylines.length > 1 ? 's' : ''}!<br>
+                        <strong style="color: #ffd700;">Total Payout: $${totalPayout.toFixed(2)}</strong><br><br>
+                        ${winDetails}<br><br>
+                        We're donating $${donationAmount.toFixed(2)} (${DONATION_PERCENTAGE}% of your $${complexGameState.betAmount.toLocaleString()} bet) to ${cause.name}.
+                    `;
+                }
                 spinResultModal.classList.remove('loss');
                 spinResultModal.classList.add('win');
             } else {
