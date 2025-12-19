@@ -2091,9 +2091,13 @@
                 <h3 style="color: #4ade80; margin-top: 20px; margin-bottom: 8px; font-size: 1rem;">🛡️ Save Spin Feature:</h3>
                 <p style="background: rgba(74, 222, 128, 0.15); padding: 12px; border-radius: 5px; border-left: 3px solid #4ade80; margin-bottom: 15px; font-size: 0.9rem;">
                     <strong>What is a Save Spin?</strong><br>
-                    If any winning payline (3, 4, or 5 matching symbols) matches your selected cause emoji, you trigger a <strong>Save Spin</strong>!<br><br>
-                    <strong>Save Spin Effect:</strong> You recover your <strong>entire bet</strong> (break even), regardless of the normal payout calculation.<br><br>
-                    <strong>Example:</strong> You bet $100 and win on 1 line with 3× cause emoji. Normally you'd get $12, but with Save Spin you recover the full $100!<br><br>
+                    If any winning payline (3 or 4 matching symbols, <strong>not 5</strong>) matches your selected cause emoji, and your normal payout would be <strong>less than your bet</strong>, you trigger a <strong>Save Spin</strong>!<br><br>
+                    <strong>Save Spin Effect:</strong> You recover your <strong>entire bet</strong> (break even) instead of taking a loss.<br><br>
+                    <strong>Important Rules:</strong><br>
+                    • Save Spin only activates when normal payout &lt; bet amount<br>
+                    • If you'd win more than your bet, you get the normal payout (no Save Spin)<br>
+                    • Special Max Combo (5× cause symbols) never triggers Save Spin - you get the ×6.0 multiplier!<br><br>
+                    <strong>Example:</strong> You bet $100 and win on 1 line with 3× cause emoji. Normal payout: $12. Since $12 &lt; $100, Save Spin activates → You recover $100!<br><br>
                     <em style="color: #4ade80;">💚 You still donate 5% to your cause, even on Save Spins!</em>
                 </p>
                 
@@ -2130,17 +2134,18 @@
                     <span>🛡️</span> <span>Save Spin - Recover Your Bet!</span>
                 </h3>
                 <p style="margin-bottom: 10px; font-size: 0.9rem; line-height: 1.6;">
-                    <strong>How it works:</strong> When a winning payline (3, 4, or 5 matching symbols) contains your <strong>selected cause emoji</strong>, you trigger a Save Spin!
+                    <strong>How it works:</strong> When a winning payline (3 or 4 matching symbols, <strong>not 5</strong>) contains your <strong>selected cause emoji</strong>, and your normal payout would be less than your bet, you trigger a Save Spin!
                 </p>
                 <div style="background: rgba(0, 0, 0, 0.3); padding: 10px; border-radius: 5px; margin-bottom: 10px;">
                     <p style="margin: 0; font-size: 0.85rem; line-height: 1.6;">
-                        <strong style="color: #4ade80;">✓ Full Bet Recovery:</strong> Get your entire bet back (break even)<br>
+                        <strong style="color: #4ade80;">✓ Full Bet Recovery:</strong> Get your entire bet back (break even) when you'd otherwise lose<br>
                         <strong style="color: #4ade80;">✓ Still Donate:</strong> 5% of your bet goes to your cause<br>
-                        <strong style="color: #4ade80;">✓ Works on Any Win:</strong> 3×, 4×, or 5× cause symbols all trigger Save Spin
+                        <strong style="color: #4ade80;">✓ Smart Activation:</strong> Only triggers when normal payout &lt; bet (won't reduce your winnings!)<br>
+                        <strong style="color: #ffd700;">⚠️ Special Max Combo:</strong> 5× cause symbols get ×6.0 multiplier (no Save Spin)
                     </p>
                 </div>
                 <p style="margin: 0; font-size: 0.85rem; color: #aaa; font-style: italic;">
-                    <strong>Example:</strong> Bet $100 → Win 1 line with 3× 🌱 → Save Spin triggers → Recover $100 (net: $0) + $5 donation to Reforest City A
+                    <strong>Example:</strong> Bet $100 → Win 1 line with 3× 🌱 → Normal payout: $12 → Since $12 &lt; $100, Save Spin triggers → Recover $100 (net: $0) + $5 donation
                 </p>
             </div>
             
@@ -3296,16 +3301,25 @@
             setTimeout(() => drawPaylines(winningPaylines), 100);
 
             if (isWin) {
-                // Check if any winning payline is a "save spin" (cause-aligned)
-                const hasSaveSpin = winningPaylines.some(win => win.isSaveSpin);
+                // Calculate normal payout first
+                const normalPayout = calculatePayout(winningPaylines, betAmount);
+                
+                // Check if Save Spin should activate:
+                // 1. Must have a cause-aligned winning line (but NOT special max combo)
+                // 2. Normal payout must be less than bet (player would lose money)
+                // 3. Special Max Combo (5× cause) never triggers Save Spin
+                const hasSaveSpinEligible = winningPaylines.some(win => 
+                    win.isSaveSpin && !win.isSpecialMaxCombo
+                );
+                const shouldActivateSaveSpin = hasSaveSpinEligible && normalPayout < betAmount;
                 
                 let totalPayout;
-                if (hasSaveSpin) {
-                    // Save spin: recover full bet (break even)
+                if (shouldActivateSaveSpin) {
+                    // Save spin: recover full bet (break even) when normal payout would be less than bet
                     totalPayout = betAmount;
                 } else {
-                    // Normal payout calculation
-                    totalPayout = calculatePayout(winningPaylines, betAmount);
+                    // Normal payout calculation (player wins money or special max combo)
+                    totalPayout = normalPayout;
                 }
                 
                 const donationAmount = (betAmount * DONATION_PERCENTAGE) / 100;
@@ -3337,8 +3351,7 @@
                 
                 // Show spin result popup
                 setTimeout(() => {
-                    const hasSaveSpin = winningPaylines.some(win => win.isSaveSpin);
-                    showComplexSpinResult(true, winningPaylines, totalPayout, donationAmount, hasSaveSpin);
+                    showComplexSpinResult(true, winningPaylines, totalPayout, donationAmount, shouldActivateSaveSpin);
                 }, 500);
             } else {
                 // No win - deduct the bet amount
