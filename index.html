@@ -3095,7 +3095,9 @@
             let totalPayout = 0;
             
             winningPaylines.forEach(win => {
-                const linePayout = betPerLine * win.multiplier;
+                // Payout includes bet back + winnings
+                // Line payout = bet back + (bet * multiplier)
+                const linePayout = betPerLine + (betPerLine * win.multiplier);
                 totalPayout += linePayout;
             });
             
@@ -3232,10 +3234,10 @@
                 const totalPayout = calculatePayout(winningPaylines, betAmount);
                 const donationAmount = (betAmount * DONATION_PERCENTAGE) / 100;
                 
-                // Calculate net result: payout - bet (bet was already deducted, so we add payout)
-                // Since we haven't deducted yet, we do: balance - bet + payout = balance + (payout - bet)
-                const netResult = totalPayout - betAmount;
-                complexGameState.walletBalance += netResult; // This is the net change
+                // Payout already includes bet back, so we just add the payout
+                // Then deduct the bet to get net result
+                complexGameState.walletBalance += totalPayout;
+                complexGameState.walletBalance -= betAmount; // Deduct the bet
                 updateWalletDisplay();
                 saveWalletBalance();
                 
