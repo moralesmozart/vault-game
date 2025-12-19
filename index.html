@@ -1850,6 +1850,22 @@
             <div class="complex-slot-machine">
                 <h2 style="color: #d4af37; margin-bottom: 20px;">The Vault</h2>
                 
+                <!-- Wallet Section -->
+                <div class="wallet-section" style="background: rgba(15, 52, 96, 0.4); border: 2px solid rgba(212, 175, 55, 0.3); border-radius: 10px; padding: 15px; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="font-size: 1.5rem;">💰</span>
+                            <div>
+                                <div style="color: #aaa; font-size: 0.85rem; margin-bottom: 5px;">Wallet Balance</div>
+                                <div id="walletBalanceComplex" style="color: #4ade80; font-size: 1.5rem; font-weight: 700;">$0.00</div>
+                            </div>
+                        </div>
+                        <button class="add-balance-button" id="addBalanceButtonComplex" style="background: rgba(212, 175, 55, 0.2); border: 2px solid #d4af37; color: #d4af37; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600; transition: all 0.3s ease;">
+                            + Add Balance
+                        </button>
+                    </div>
+                </div>
+                
                 <!-- Bet Section -->
                 <div class="bet-section">
                     <label class="bet-label" for="betInputComplex">Place Your Bet</label>
@@ -2920,8 +2936,31 @@
             wins: 0,
             vaultsUnlocked: 0,
             totalImpact: 0,
+            walletBalance: 0, // Starting balance
             grid: Array(GRID_ROWS).fill(null).map(() => Array(GRID_COLS).fill(null))
         };
+        
+        // Load wallet balance from localStorage
+        function loadWalletBalance() {
+            const saved = localStorage.getItem('complexWalletBalance');
+            if (saved !== null) {
+                complexGameState.walletBalance = parseFloat(saved) || 0;
+            }
+            updateWalletDisplay();
+        }
+        
+        // Save wallet balance to localStorage
+        function saveWalletBalance() {
+            localStorage.setItem('complexWalletBalance', complexGameState.walletBalance.toString());
+        }
+        
+        // Update wallet display
+        function updateWalletDisplay() {
+            const walletDisplay = document.getElementById('walletBalanceComplex');
+            if (walletDisplay) {
+                walletDisplay.textContent = `$${complexGameState.walletBalance.toFixed(2)}`;
+            }
+        }
 
         // Complex Slot DOM Elements
         const complexGridContainer = document.getElementById('complexGridContainer');
@@ -3184,6 +3223,11 @@
                 const totalPayout = calculatePayout(winningPaylines, complexGameState.betAmount);
                 const donationAmount = (complexGameState.betAmount * DONATION_PERCENTAGE) / 100;
                 
+                // Add winnings to wallet
+                complexGameState.walletBalance += totalPayout;
+                updateWalletDisplay();
+                saveWalletBalance();
+                
                 // Highlight winning cells with neon effect
                 winningPaylines.forEach(win => {
                     win.positions.forEach(([row, col]) => {
@@ -3240,6 +3284,7 @@
             betAmountDisplayComplex.textContent = `Bet: $${bet.toLocaleString()}`;
             betPercentageComplex.textContent = `${DONATION_PERCENTAGE}%`;
             updateComplexSpinButtonState();
+            updateWalletDisplay(); // Update wallet display when bet changes
         }
 
         function updateComplexSpinButtonState() {
@@ -3325,14 +3370,40 @@
                 bet = 10000;
                 betInputComplex.value = 10000;
             }
+            if (bet > complexGameState.walletBalance) {
+                bet = complexGameState.walletBalance;
+                betInputComplex.value = complexGameState.walletBalance;
+            }
             complexGameState.betAmount = bet;
             updateComplexBetDisplay();
         });
 
         betMaxButtonComplex.addEventListener('click', () => {
-            betInputComplex.value = 10000;
-            complexGameState.betAmount = 10000;
+            const maxBet = Math.min(10000, complexGameState.walletBalance);
+            betInputComplex.value = maxBet;
+            complexGameState.betAmount = maxBet;
             updateComplexBetDisplay();
+        });
+        
+        // Add Balance Button
+        const addBalanceButtonComplex = document.getElementById('addBalanceButtonComplex');
+        addBalanceButtonComplex.addEventListener('click', () => {
+            const amount = prompt('Enter amount to add to wallet (max $10,000):', '1000');
+            if (amount !== null) {
+                const addAmount = parseFloat(amount);
+                if (isNaN(addAmount) || addAmount <= 0) {
+                    alert('Please enter a valid positive number.');
+                    return;
+                }
+                if (addAmount > 10000) {
+                    alert('Maximum amount is $10,000.');
+                    return;
+                }
+                complexGameState.walletBalance += addAmount;
+                updateWalletDisplay();
+                saveWalletBalance();
+                updateComplexSpinButtonState();
+            }
         });
 
         spinButtonComplex.addEventListener('click', spinComplex);
