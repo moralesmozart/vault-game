@@ -1830,8 +1830,11 @@
                 <!-- Spin Button -->
                 <button class="spin-button" id="spinButtonComplex" disabled>SPIN</button>
 
-                <!-- Help Button -->
-                <button class="complex-help-button" id="complexHelpButton">How Paylines Work</button>
+                <!-- Help Buttons -->
+                <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
+                    <button class="complex-help-button" id="complexHelpButton">How Paylines Work</button>
+                    <button class="complex-help-button" id="showPaylinesButton">Show Paylines Possible Wins</button>
+                </div>
             </div>
 
             <!-- Cause Selection (Right) -->
@@ -3251,6 +3254,76 @@
 
         complexHelpClose.addEventListener('click', () => {
             complexHelpOverlay.classList.remove('active');
+        });
+        
+        // Paylines Visualization
+        const showPaylinesButton = document.getElementById('showPaylinesButton');
+        const paylinesVisualizationOverlay = document.getElementById('paylinesVisualizationOverlay');
+        const paylinesVisualizationGrid = document.getElementById('paylinesVisualizationGrid');
+        const paylinesButtonsContainer = document.getElementById('paylinesButtonsContainer');
+        
+        // Initialize paylines visualization
+        function initializePaylinesVisualization() {
+            // Create visualization grid
+            paylinesVisualizationGrid.innerHTML = '';
+            for (let row = 0; row < GRID_ROWS; row++) {
+                for (let col = 0; col < GRID_COLS; col++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'payline-visualization-cell';
+                    cell.id = `viz-cell-${row}-${col}`;
+                    cell.dataset.row = row;
+                    cell.dataset.col = col;
+                    // Use a sample symbol for visualization
+                    const sampleSymbol = complexSymbolWeightedArray[Math.floor(Math.random() * complexSymbolWeightedArray.length)];
+                    cell.textContent = sampleSymbol;
+                    paylinesVisualizationGrid.appendChild(cell);
+                }
+            }
+            
+            // Create payline buttons
+            paylinesButtonsContainer.innerHTML = '';
+            PAYLINES.forEach((payline, index) => {
+                const button = document.createElement('button');
+                button.className = 'payline-button';
+                button.textContent = `Payline ${index + 1}`;
+                button.dataset.paylineIndex = index;
+                button.addEventListener('click', () => highlightPayline(index));
+                paylinesButtonsContainer.appendChild(button);
+            });
+        }
+        
+        // Highlight a specific payline
+        function highlightPayline(paylineIndex) {
+            // Remove all highlights
+            document.querySelectorAll('.payline-visualization-cell').forEach(cell => {
+                cell.classList.remove('highlighted');
+            });
+            
+            // Remove active state from all buttons
+            document.querySelectorAll('.payline-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Highlight the selected payline
+            const payline = PAYLINES[paylineIndex];
+            payline.forEach(([row, col]) => {
+                const cell = document.getElementById(`viz-cell-${row}-${col}`);
+                if (cell) {
+                    cell.classList.add('highlighted');
+                }
+            });
+            
+            // Mark button as active
+            const button = document.querySelector(`[data-payline-index="${paylineIndex}"]`);
+            if (button) {
+                button.classList.add('active');
+            }
+        }
+        
+        // Show paylines visualization modal
+        showPaylinesButton.addEventListener('click', () => {
+            initializePaylinesVisualization();
+            paylinesVisualizationOverlay.classList.add('active');
         });
 
         complexHelpOverlay.addEventListener('click', (e) => {
